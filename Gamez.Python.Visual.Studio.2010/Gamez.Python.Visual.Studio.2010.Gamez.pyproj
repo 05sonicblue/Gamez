@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3806c02d-8c19-47ff-a625-9d5594f2babe}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>Program.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>Gamez.Python.Visual.Studio.2010.Gamez</Name>
+    <RootNamespace>Gamez.Python.Visual.Studio.2010.Gamez</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="lib\WebRoot.py" />
+    <Compile Include="lib\__init__.py" />
+    <Compile Include="Program.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\images\item-pointer-mover.gif" />
+    <Content Include="css\images\item-pointer.gif" />
+    <Content Include="css\images\lava.gif" />
+    <Content Include="css\images\lava.png" />
+    <Content Include="css\images\main-bg.png" />
+    <Content Include="css\images\main-delimiter.png" />
+    <Content Include="Gamez.App.ini" />
+    <Content Include="Gamez.ini" />
+    <Content Include="css\navigation.css" />
+    <Content Include="images\item-pointer-mover.gif" />
+    <Content Include="images\item-pointer.gif" />
+    <Content Include="images\lava.gif" />
+    <Content Include="images\lava.png" />
+    <Content Include="images\main-bg.png" />
+    <Content Include="images\main-delimiter.png" />
+    <Content Include="scripts\jquery.dataTables.js" />
+    <Content Include="scripts\jquery.js" />
+    <Content Include="scripts\menu.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="css\images\" />
+    <Folder Include="images" />
+    <Folder Include="lib" />
+    <Folder Include="scripts" />
+    <Folder Include="css" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+</Project>

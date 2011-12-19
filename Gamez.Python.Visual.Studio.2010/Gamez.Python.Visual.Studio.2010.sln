@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Gamez.Python.Visual.Studio.2010.Gamez", "Gamez.Python.Visual.Studio.2010.Gamez.pyproj", "{3806C02D-8C19-47FF-A625-9D5594F2BABE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3806C02D-8C19-47FF-A625-9D5594F2BABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3806C02D-8C19-47FF-A625-9D5594F2BABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
