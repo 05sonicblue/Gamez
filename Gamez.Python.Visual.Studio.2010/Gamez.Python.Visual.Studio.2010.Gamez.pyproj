@@ -22,6 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="lib\DBFunctions.py" />
     <Compile Include="lib\WebRoot.py" />
     <Compile Include="lib\__init__.py" />
     <Compile Include="Program.py" />

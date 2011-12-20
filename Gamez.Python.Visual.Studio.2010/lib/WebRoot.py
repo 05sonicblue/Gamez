@@ -1,5 +1,6 @@
 import cherrypy
 import json
+from DBFunctions import GetAllWiiGames
 
 class WebRoot:
     @cherrypy.expose
@@ -21,7 +22,7 @@ class WebRoot:
                                     </a>
                                 </li>
                                 <li class="parent">
-                                    <a href="/">
+                                    <a href="/wii">
                                         Wii (Browse)
                                     </a>
                                 </li>
@@ -79,10 +80,7 @@ class WebRoot:
                                 {key:"nintendo_id", label:"Nintendo Game ID", abbr:"NintendoID"},
                                 {key:"game_title", label:"Game Title", abbr:"Title"}
                             ],
-                            data = [
-                                {db_id:"1", nintendo_id:"RVDX01", game_title:"Super Mario Bros."}
-                            ],
-
+                            data = """ + GetAllWiiGames() + """,
                             dataTable = new Y.DataTable.Base({columnset:cols, recordset:data, summary:"Price sheet for inventory parts", caption:"Wii Games"}).render("#wiigamestable");
                         });
                         </script>
@@ -98,5 +96,5 @@ class WebRoot:
 
     @cherrypy.expose
     def search(self):
-        return "test"
+        return GetAllWiiGames()
 
