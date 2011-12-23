@@ -5,10 +5,12 @@ import urllib2
 import os
 import shutil
 import stat
+from subprocess import call
 
 class GameTasks():
 
     def FindGames(self, nzbmatrixusername, nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort):
+        GameTasks().CheckIfPostProcessExistsInSab(sabnzbdApi,sabnzbdHost,sabnzbdPort)
         nzbmatrixusername = nzbmatrixusername.replace('"','')
         nzbmatrixapi = nzbmatrixapi.replace('"','')
         games = GetRequestedGamesAsArray()
@@ -40,12 +42,12 @@ class GameTasks():
         return
 
     def AddNZBToSab(self,nzbID,game_name,sabnzbdApi,sabnzbdHost,sabnzbdPort,game_id):
-        GameTasks().CheckIfPostProcessExistsInSab(sabnzbdApi,sabnzbdHost,sabnzbdPort)
         nzbUrl = "http://api.nzbmatrix.com/v1.1/download.php?id=" + nzbID
         url = "http://" + sabnzbdHost + ":" +  sabnzbdPort + "/sabnzbd/api?mode=addurl&pp=3&apikey=" + sabnzbdApi + "&script=gamezPostProcess.py&name=" + nzbUrl + "&nzbname=[" + game_id + "] - "+ game_name
         responseObject = urllib.FancyURLopener({}).open(url)
         responseObject.read()
         responseObject.close()
+        return
 
     def CheckIfPostProcessExistsInSab(self,sabnzbdApi,sabnzbdHost,sabnzbdPort):
         path = os.path.abspath("postprocess")
@@ -58,14 +60,13 @@ class GameTasks():
         scriptDir = response.split(":")[2].replace("'","").replace(" ","").replace("{","").replace("}","").replace("\n","")
         destPath = os.path.join(scriptDir,"gamezPostProcess.py")
 
-        if(os.path.isfile(destPath) == False):
-            try:
-                shutil.copyfile(srcPath,destPath)
-            except:
-                print 'Error Copying File'
         try:
-            if (os.access(destPath, os.R_OK) == False):
-                os.chmod(destPath,stat.S_IRWXO)
+            shutil.copyfile(srcPath,destPath)
+        except:
+            print 'Error Copying File'
+        try:
+            cmd = "chmod +x '" + destPath + "'"
+            os.system(cmd)
         except:
             print 'Error Setting Permissions'
         return

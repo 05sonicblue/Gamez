@@ -105,7 +105,7 @@ def AddWiiGameToDb(db_id,status):
 
 def GetRequestedGames():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT wii_games.id,game_name,game_id,status FROM requested_games inner join wii_games on requested_games.WiiGameID = wii_games.ID"
+    sql = "SELECT wii_games.id,game_name,game_id,status FROM requested_games inner join wii_games on requested_games.WiiGameID = wii_games.ID  order by game_name asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -136,7 +136,7 @@ def RemoveWiiGameFromDb(db_id):
 
 def GetRequestedGamesAsArray():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT game_name,WiiGameID FROM requested_games inner join wii_games on requested_games.WiiGameID = wii_games.ID WHERE status='Wanted'"
+    sql = "SELECT game_name,WiiGameID FROM requested_games inner join wii_games on requested_games.WiiGameID = wii_games.ID WHERE status='Wanted'  order by game_name asc"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
