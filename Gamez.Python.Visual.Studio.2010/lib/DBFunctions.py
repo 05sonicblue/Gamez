@@ -14,14 +14,13 @@ def GetAllWiiGames():
             game_name.replace("'","''")
             id = str(record[1])
             game_id = str(record[2])
-            rowdata = '{db_id:"' + id + '",nintendo_id:"' + game_id + '",game_title:"' + game_name + '"},'
-            data = data + rowdata
+            rowdata = id + "::" + game_id + "::" + game_name + "\r\n"
+            data = data + rowdata + "||"
             #{db_id:"1", nintendo_id:"RVDX01", game_title:"Super Mario Bros."},
         except:
             continue
     cursor.close()
-    data = data[:-1]
-    data = '{"recordsReturned": 6001,"totalRecords":6001,"startIndex":0,"sort":null,"dir":"asc","records":[' + data + "]}"
+    data = data[:-2]
     return data
 
 

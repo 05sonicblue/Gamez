@@ -1,0 +1,16 @@
+/* igColorEditor */
+.ui-igcoloreditor { background:#d0d0d0; cursor:default; z-index:100000; margin-left:0px; margin-top:0px; }
+.ui-igcoloreditor-tooltip { position:absolute; padding:3px; font-weight:bold; text-align:right; background:#f0f0f0; border:1px solid #606060; line-height:12px; font-size:12px; font-family:courier; color:#555555; }
+.ui-igcoloreditor-text-tooltip { text-align:left; font-family:verdana; background:#e6e6e6; }
+.ui-igcoloreditor-3dtext { position:absolute; font-weight:bold; line-height:12px; font-size:12px; color:#555555; padding-top:3px; padding-bottom:5px; }
+.ui-igcoloreditor-3dtext-shadow { visibility:hidden; color:#e6e6e6; }
+.ui-igcoloreditor-3dtext-hover { margin-top:1px; margin-left:1px; color:#303030; }
+.ui-igcoloreditor-3dtext-hover-shadow { visibility:visible; background:#c0c0d0; }
+.ui-igcoloreditor-3dtext-pressed { margin-top:-1px; margin-left:-1px; color:#404040; }
+.ui-igcoloreditor-3dtext-pressed-shadow { visibility:visible; }
+.ui-igcoloreditor-thumb { margin-left:-1px; margin-top:-1px; border:1px solid; }
+.ui-igcoloreditor-thumb-active { margin-left:-2px; margin-top:-2px; border:2px solid; }
+.ui-igcoloreditor-help { line-height:11px; font-size:11px; background:#e6e6e6; border:1px solid #aaaaaa; margin-left:-1; margin-top:-1; overflow:auto; }
+.ui-igcoloreditor-list { line-height:10px; font-size:10px; background:#e6e6e6; border:1px solid #aaaaaa; margin-left:-1; margin-top:-1; }
+.ui-igcoloreditor-list-item { background:#e6e6e6; overflow:hidden; }
+.ui-igcoloreditor-list-item-hover { z-index:100; overflow:visible; width:auto !important; }

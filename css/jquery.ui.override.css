@@ -1,0 +1,37 @@
+
+
+
+.ui-autocomplete {
+	max-height: 300px;
+	overflow-y: auto;
+	/* prevent horizontal scrollbar */
+	overflow-x: hidden;
+	/* add padding to account for vertical scrollbar */
+	padding-right: 10px;
+}
+
+/* IE 6 doesn't support max-height
+	* we use height instead, but this forces the menu to always be this tall
+	*/
+* html .ui-autocomplete {
+	height: 300px;
+}
+
+input.ui-autocomplete-input
+{
+    width:300px
+}
+
+/*tr.even
+{
+    background-color: Red;
+}
+
+tr.odd
+{
+    background-color: green;
+}
+
+
+*/
+

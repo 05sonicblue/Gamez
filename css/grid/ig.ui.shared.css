@@ -1,0 +1,415 @@
+/*////////////////////////////////// INFRAGISTICS SHARED WIDGETS CSS //////////////////////////////////*/
+
+/* Layout helpers
+----------------------------------*/
+.ui-helper-hidden { display: none }
+.ui-helper-hidden-accessible {
+    position: absolute;
+    left: -99999999px;
+}
+.ui-helper-reset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    line-height: 1.3;
+    text-decoration: none;
+    font-size: 100%;
+    list-style: none;
+}
+.ui-helper-clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.ui-helper-clearfix { display: inline-block }
+/* required comment for clearfix to work in Opera \*/
+* html .ui-helper-clearfix { height: 1% }
+.ui-helper-clearfix { display: block }
+/* end clearfix */
+.ui-helper-zfix {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    opacity: 0;
+    filter: Alpha(Opacity=0);
+}
+
+/*
+ * jQuery UI Button @VERSION
+ *
+ * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Button#theming
+ */
+.ui-button {
+    display: inline-block;
+    nowhitespace: afterproperty;
+    position: relative;
+    padding: 0;
+    margin-right: .1em;
+    text-decoration: none !important; /* !important comes from jquery ui default */
+    cursor: pointer;
+    text-align: center;
+    zoom: 1;
+    overflow: visible;
+} /* the overflow property removes extra width in IE */
+.ui-button-icon-only { width: 2.4em } /* to make room for the icon, a width needs to be set here */
+button.ui-button-icon-only { width: 2.4em } /* button elements seem to need a little more width */
+.ui-button-icons-only { width: 3.7em }
+button.ui-button-icons-only { width: 3.7em }
+.ui-button span {
+    -moz-border-radius: 3px;
+    nowhitespace: afterproperty;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+/*.ui-button.ui-state-hover {-moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0px 0px 8px rgba(212,212,212,1); box-shadow: 0px 0px 8px rgba(212,212,212,1)}*/
+/* === INPUT:SUBMIT BUG FIX === */
+input.ui-button {
+    font-weight: normal;
+    line-height: 1.2;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    outline: none;
+}
+input.ui-button:hover {
+}
+input.ui-button:active {
+
+}
+/* === IE6 AND IE7 BUTTON WIDTH FIX === */
+.ui-button { *display: inline}
+.ui-state-default .ui-button-text {
+
+}
+.ui-state-hover .ui-button-text {
+}
+.ui-state-active .ui-button-text {
+
+}
+/*button text element */
+.ui-button .ui-button-text {
+    display: block;
+    line-height: 1.2;
+    font-weight: normal;
+}
+.ui-button-text-only .ui-button-text { padding: 5px 12px }
+.ui-button-icon-only .ui-button-text,
+.ui-button-icons-only .ui-button-text {
+    padding: 3px 5px 5px;
+    text-indent: -9999999px;
+}
+.ui-button-text-icon-primary .ui-button-text,
+.ui-button-text-icons .ui-button-text { padding: 3px 12px 5px 25px }
+.ui-button-text-icon-secondary .ui-button-text { padding: 3px 25px 5px 12px }
+.ui-button-text-icons .ui-button-text { padding: 3px 25px 5px }
+/* no icon support for input elements, provide padding by default */
+input.ui-button { padding: 3px 12px }
+/*button icon element(s) */
+.ui-button .ui-icon { border: 0px none }
+.ui-button-icon-only .ui-icon,
+.ui-button-text-icon-primary .ui-icon,
+.ui-button-text-icon-secondary .ui-icon,
+.ui-button-text-icons .ui-icon,
+.ui-button-icons-only .ui-icon {
+    position: absolute;
+    top: 50%;
+    margin-top: -8px;
+    margin-left: 6px;
+}
+.ui-button-icon-only .ui-icon {
+    left: 50%;
+    margin-left: -8px;
+}
+.ui-button-text-icon-primary .ui-button-icon-primary,
+.ui-button-text-icons .ui-button-icon-primary,
+.ui-button-icons-only .ui-button-icon-primary { left: 0 }
+.ui-button-text-icon-secondary .ui-button-icon-secondary,
+.ui-button-text-icons .ui-button-icon-secondary,
+.ui-button-icons-only .ui-button-icon-secondary { right: .4em }
+.ui-button-text-icons .ui-button-icon-secondary,
+.ui-button-icons-only .ui-button-icon-secondary { right: .4em }
+/*button sets*/
+.ui-buttonset { margin-right: 7px }
+.ui-buttonset .ui-button {
+    margin-left: 0;
+    margin-right: -.3em;
+}
+.ui-buttonset,
+.ui-buttonset span {
+    -moz-border-radius: 0px !important;
+    -webkit-border-radius: 0px !important;
+    border-radius: 0px !important;
+}
+.ui-corner-left .ui-button-text {
+    -moz-border-radius-topleft: 4px !important;
+    -webkit-border-top-left-radius: 4px !important;
+    border-top-left-radius: 4px !important;
+    -moz-border-radius-bottomleft: 4px !important;
+    -webkit-border-bottom-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+}
+.ui-corner-right .ui-button-text {
+    -moz-border-radius-topright: 4px !important;
+    -webkit-border-top-right-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+    -moz-border-radius-bottomright: 4px !important;
+    -webkit-border-bottom-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+}
+.ui-buttonset .ui-state-active .ui-button-text {
+    cursor: default;
+    -moz-box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+}
+/* workarounds */
+button.ui-button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+} /* reset extra padding in Firefox */
+
+
+/*////////////////////////////////// igProgressBar CSS ////////////////////////////////////////////////*/
+.ui-igprogressbar { position: relative; text-align: left; }
+.ui-igprogressbar .ui-igprogressbar-range { 
+    position: absolute; 
+    z-index: 1; 
+    font-size: .7em; 
+    display: block; 
+    border: 0; 
+    background-position: 0 0; 
+    background-color: lightgray;
+}
+
+.ui-igprogressbar-horizontal { height: .8em; }
+.ui-igprogressbar-horizontal .ui-igprogressbar-range { top: 0; height: 100%; }
+
+.ui-igprogressbar-vertical { width: .8em; height: 100px; }
+.ui-igprogressbar-vertical .ui-igprogressbar-range { left: 0; width: 100%; }
+/*////////////////////////////////// END igProgressBar CSS ////////////////////////////////////////////*/
+
+/*///////////////////////////////////////// igSlider CSS //////////////////////////////////////////////*/
+
+.ui-igslider { position: relative; text-align: left; }
+.ui-igslider .ui-igslider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+.ui-igslider .ui-igslider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+
+.ui-igslider-horizontal { height: .8em; }
+.ui-igslider-horizontal .ui-igslider-handle { top: -5px; margin-left: -.6em; }
+.ui-igslider-horizontal .ui-igslider-range { top: 0; height: 100%; }
+.ui-igslider-horizontal .ui-igslider-range-min { left: 0; }
+.ui-igslider-horizontal .ui-igslider-range-max { right: 0; }
+
+.ui-igslider-vertical { width: .8em; height: 100px; }
+.ui-igslider-vertical .ui-igslider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
+.ui-igslider-vertical .ui-igslider-range { left: 0; width: 100%; }
+.ui-igslider-vertical .ui-igslider-range-min { bottom: 0; }
+.ui-igslider-vertical .ui-igslider-range-max { top: 0; }
+
+.ui-igslider .ui-igslider-progress { background-color: red; }
+.ui-igslider .ui-igslider-bookmark  
+{
+    cursor: pointer; 
+    width: 11px; 
+    height: 11px; 
+    position: absolute; 
+    
+    z-index: 2; 
+    top: .15em;
+    
+    background: none;
+    border:none!important;
+}
+
+    .ui-igslider .ui-igslider-bookmark.ui-state-default 
+    {
+        background: url("images/igVideoPlayer/igVPBookmarkSprite.png") no-repeat 0px 0px;    
+    }
+
+    .ui-igslider .ui-igslider-bookmark.ui-state-hover 
+    {
+        background: url("images/igVideoPlayer/igVPBookmarkSprite.png") no-repeat 0px -19px;    
+    }
+
+    .ui-igslider .ui-igslider-bookmark.ui-state-active 
+    {
+        background: url("images/igVideoPlayer/igVPBookmarkSprite.png") no-repeat 0px -18px;
+    }
+
+.ui-igslider .ui-igslider-bookmark-disabled { cursor: default; height: .2em; position: absolute; width: .2em; z-index: 2; top: .3em; }
+.ui-igslider .ui-igslider-bookmark-tooltip  
+{
+    cursor: default;
+    position: absolute; 
+    width: 5.5em; 
+    z-index: 10; 
+    overflow: hidden;
+}
+
+/*/////////////////////////////////////////END igSlider CSS ///////////////////////////////////////*/
+
+/*////////////////////////////////////igBrowseButton CSS ///////////////////////////////////////////*/
+
+.ui-igbrowsebutton {
+    font-weight:bold; font-size:1.3em;
+	font-family:Arial, Helvetica, sans-serif;
+	text-align:center;
+	background:#f2f2f2;
+	color:#3366cc;
+	border:1px solid #ccc;
+	cursor:pointer !important;
+	padding:1px;	
+}
+
+.ui-igbrowsebutton-filepicker {
+    position : absolute;
+	margin: -5px 0 0 -175px;
+	padding: 0;
+	width: 220px;
+	height: 30px;
+	fontSize: 14px;
+	opacity: 0;
+	cursor: pointer;
+	display : none;
+	zIndex :  2147483583;
+	filter:alpha(opacity=0);
+}
+
+.ui-igbrowsebutton-label 
+{    
+    }
+/*//////////////////////////END igBrowseButton CSS /////////////////////////////////////////*/
+
+/*//////////////////////////  igButton CSS /////////////////////////////////////////////////*/
+
+.ui-igbutton 
+{
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 0.1em;
+    overflow: visible;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.ui-igbutton .ui-state-hover { }
+
+.ui-igbutton .ui-state-focus { }
+
+.ui-igbutton .ui-state-active { }
+
+.ui-igbutton-icon 
+{
+    height: 16px;
+    width: 16px;
+}
+
+.ui-igbutton-label  
+{
+}
+
+/*/////////////////////////  END igButton CSS //////////////////////////////////////////////////*/
+
+/*////////////////////////////////// igTooltip CSS ////////////////////////////////////////////////*/
+
+.ui-igtooltip {
+	position: absolute;
+	z-index: 10000;
+
+	font-size:11px;
+	color:#525252;
+ 
+}
+
+.ui-igtooltip .ui-widget-content {
+	padding: 4px;
+	overflow: hidden;
+	
+	font-size:11px;
+	
+	background:url("images/igTooltip/igTooltipBackground.svg") no-repeat;
+	
+	background-color: #DADADA;
+    background-image:none;
+    
+    /* Added to make a consistent look and feel among all Jquery themes */
+    color:#333333;
+    font-weight:normal;
+    
+    background-color: -moz-linear-gradient(center top , #ffffff, #DADADA);
+	background-image: -moz-linear-gradient(top, #ffffff, #DADADA);
+	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #ffffff),color-stop(1, #DADADA));
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%, #DADADA)); 
+	
+	border:1px solid #B1B1B1;
+    -moz-box-shadow: 	0px 0px 10px black;
+    -webkit-box-shadow: 0px 0px 10px black;
+    box-shadow: 		0px 0px 10px black;
+}
+
+.ui-igtooltip-arrow-top {
+	z-index: 10000;
+	background: transparent url("images/igTooltip/igTooltipArrowTop.gif") no-repeat 100% 100%;
+	width: 20px;
+	height: 20px;
+	
+	position:relative;
+	left:50%;
+	margin-left:-10px;
+}
+
+.ui-igtooltip-arrow-left {
+
+}
+
+.ui-igtooltip-arrow-right {
+
+}
+
+.ui-igtooltip-arrow-bottom {
+	z-index: 10000;
+	background: transparent url("images/igTooltip/igTooltipArrowBottom.png") no-repeat 100% 100%;
+	width: 14px;
+	height: 7px;
+	
+	position:relative;
+	left:50%;
+	top:-1px;
+	margin-left:-7px;
+}
+/*////////////////////////////////// END igTooltip CSS ////////////////////////////////////////////*/
+
+
+/* igLoadingMsg */
+
+.ui-igloadingmsg {
+	background-image: url(images/ui-anim_basic_16x16.gif);
+	position: absolute;
+	z-index: 20000;
+	width: 16px;
+	height: 16px;
+}
+
+.ui-iggrid-indicatorcontainer {
+	display:inline;
+}
+/* igFileUploader */
+/*.ui-igfileupload .ui-igprogressbar 
+{
+    background-color: -moz-linear-gradient(center top , #e0e0e0, #f9f9f9);
+	background-image: -moz-linear-gradient(top, #e0e0e0, #f9f9f9);
+	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e0e0e0),color-stop(1, #f9f9f9));
+	filter          :  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e0e0e0', EndColorStr='#f9f9f9');
+	-ms-filter      : "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e0e0e0', EndColorStr='#f9f9f9')";
+}*/

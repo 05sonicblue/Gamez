@@ -1,0 +1,32 @@
+<Configuration>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="3806C02D-8C19-47FF-A625-9D5594F2BABE/d:css/f:styles.css" caret="0" fromTop="0" />
+    </RecentFiles>
+    <RecentEdits />
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir IsNull="False">
+    </NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="CssCodeCompletionContext">
+      <Item value="input" priority="5" />
+      <Item value="height" priority="11" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+</Configuration>
