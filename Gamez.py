@@ -91,13 +91,13 @@ def GenerateSabPostProcessScript():
     file.write("\n")
     file.write('url = "' + gamezBaseUrl + 'updatestatus?game_id=" + gamezID + "&status=" + downloadStatus')
     file.write("\n")
-    file.write("print('Calling URL: ' + url)")
-    file.write("\n")
     file.write('responseObject = urllib.FancyURLopener({}).open(url)')
     file.write("\n")
     file.write('responseObject.read()')
     file.write("\n")
     file.write('responseObject.close()')
+    file.write("\n")
+    file.write('print("Processing Completed Successfully")')
     file.close
 
 def RunGameTask():
