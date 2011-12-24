@@ -4,17 +4,16 @@ import cherrypy
 import os
 from lib.WebRoot import WebRoot
 from lib.WebBrowseWii import WebBrowseWii
-from lib.Daemonize import Daemon
 import sys
 import sched
 import time
 import threading
-import lib.scheduler
 import datetime
 import lib.GameTasks
 import ConfigParser
 import cherrypy.process.plugins
 from cherrypy.process.plugins import Daemonizer
+from lib.ConfigFunctions import CheckConfigForAllKeys
 
 app_path = os.path.dirname(os.path.abspath("__FILE__"))
 config_path = os.path.join(app_path,'Gamez.ini')
@@ -24,23 +23,18 @@ class RunApp():
         cherrypy.config.update(config_path)
         css_path = os.path.join(app_path,'css')
         images_path = os.path.join(app_path,'images')
-        css_images_path = os.path.join(css_path,'images')
-        scripts_path = os.path.join(app_path,'scripts')
+        navigation_images_path = os.path.join(css_path,'navigation_images')
+        datatables_images_path = os.path.join(css_path,'datatables_images')
         js_path = os.path.join(app_path,'js')
         theme_path = os.path.join(css_path,'redmond')
         theme_images_path = os.path.join(theme_path,'images')
-        grid_theme_path = os.path.join(css_path,'grid')
-        grid_theme_images_path = os.path.join(grid_theme_path,'images')
         conf = {
                 '/css': {'tools.staticdir.on':True,'tools.staticdir.dir':css_path},
-                '/images': {'tools.staticdir.on':True,'tools.staticdir.dir':images_path},
-                '/scripts':{'tools.staticdir.on':True,'tools.staticdir.dir':scripts_path},
                 '/js':{'tools.staticdir.on':True,'tools.staticdir.dir':js_path},
-                '/css/images':{'tools.staticdir.on':True,'tools.staticdir.dir':css_images_path},
                 '/css/redmond':{'tools.staticdir.on':True,'tools.staticdir.dir':theme_path},
                 '/css/redmond/images':{'tools.staticdir.on':True,'tools.staticdir.dir':theme_images_path},
-                '/css/grid':{'tools.staticdir.on':True,'tools.staticdir.dir':grid_theme_images_path},
-                '/css/grid/images':{'tools.staticdir.on':True,'tools.staticdir.dir':grid_theme_images_path}
+                '/css/navigation_images':{'tools.staticdir.on':True,'tools.staticdir.dir':navigation_images_path},
+                '/css/datatables_images':{'tools.staticdir.on':True,'tools.staticdir.dir':datatables_images_path}
             }
         daemon = Daemonizer(cherrypy.engine)
         
@@ -101,16 +95,20 @@ def GenerateSabPostProcessScript():
     file.close
 
 def RunGameTask():
-    config = ConfigParser.RawConfigParser()
-    config.read('Gamez.ini')
-    nzbMatrixUser = config.get('NZBMatrix','username').replace('"','')
-    nzbMatrixApi = config.get('NZBMatrix','api_key').replace('"','')
-    sabnzbdHost = config.get('Sabnzbd','host').replace('"','')
-    sabnzbdPort = config.get('Sabnzbd','port').replace('"','')
-    sabnzbdApi = config.get('Sabnzbd','api_key').replace('"','')
-    lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort)
+    try:
+        config = ConfigParser.RawConfigParser()
+        config.read('Gamez.ini')
+        nzbMatrixUser = config.get('NZBMatrix','username').replace('"','')
+        nzbMatrixApi = config.get('NZBMatrix','api_key').replace('"','')
+        sabnzbdHost = config.get('Sabnzbd','host').replace('"','')
+        sabnzbdPort = config.get('Sabnzbd','port').replace('"','')
+        sabnzbdApi = config.get('Sabnzbd','api_key').replace('"','')
+        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort)
+    except:
+        print(sys.exc_info()[0])
 
 if __name__ == '__main__':
+    CheckConfigForAllKeys(app_path)
     isToDaemonize = 0
     params = sys.argv
     for param in params:

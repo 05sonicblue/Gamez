@@ -2,7 +2,7 @@ import cherrypy
 import json
 import os
 from DBFunctions import GetWiiGamesFromTerm, GetWiiGameDataFromTerm, AddWiiGameToDb, GetRequestedGames, RemoveWiiGameFromDb,UpdateStatus
-
+from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVersion
 
 class WebRoot:
     appPath = ''
@@ -11,7 +11,7 @@ class WebRoot:
         WebRoot.appPath = app_path
 
     @cherrypy.expose
-    def index(self):
+    def index(self,status_message='',version=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
         html = """
@@ -21,15 +21,23 @@ class WebRoot:
           <head>
             <link rel="stylesheet" type="text/css" href="css/navigation.css" />
             <link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css" />
-            <link rel="stylesheet" type="text/css" href="css/demo_page.css" />
-            <link rel="stylesheet" type="text/css" href="css/demo_table.css" />
+            <link rel="stylesheet" type="text/css" href="css/datatables.css" />
             <link rel="stylesheet" type="text/css" href="css/jquery.ui.override.css" />
             <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
             <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
-            <script type="text/javascript" src="scripts/menu.js"></script>
+            <script type="text/javascript" src="js/menu.js"></script>
             <script type="text/javascript" language="javascript" src="/js/jquery.dataTables.min.js"></script>
           </head>
-          <body id="dt_example">
+          <body id="dt_example">"""
+        if(status_message <> ''):
+            html = html + """
+                            <div id='_statusbar' class='statusbar statusbarhighlight'>""" + status_message + """</div>"""
+        isNewVersionAvailable = CheckForNewVersion(WebRoot.appPath)
+        if(isNewVersionAvailable):
+            html = html + """
+                            <div id='_statusbar' class='statusbar statusbarhighlight'>New Version Available :: <a href="/upgradetolatestversion?verification=SYSTEM_DIRECTED">Upgrade Now</a> | <a href="/ignorecurrentversion?verification=SYSTEM_DIRECTED">Ignore Until Next Version</a></div>
+                          """
+        html = html + """
             <div id="menu">
                 <ul class="menu">
                     <li class="parent">
@@ -194,7 +202,7 @@ class WebRoot:
         return GetWiiGamesFromTerm(term)
 
     @cherrypy.expose
-    def addgame(self,dbid):
+    def addgame(self,dbid): 
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
         AddWiiGameToDb(dbid,'Wanted')
@@ -206,3 +214,15 @@ class WebRoot:
             os.chdir(WebRoot.appPath)
         RemoveWiiGameFromDb(dbid)
         raise cherrypy.InternalRedirect('/')
+
+    @cherrypy.expose
+    def ignorecurrentversion(self,verification):
+        if(verification == "SYSTEM_DIRECTED"):
+            IgnoreVersion(WebRoot.appPath)
+        raise cherrypy.InternalRedirect('/') 
+
+    @cherrypy.expose
+    def upgradetolatestversion(self,verification):
+        if(verification == "SYSTEM_DIRECTED"):
+            status = UpdateToLatestVersion(WebRoot.appPath)
+            raise cherrypy.InternalRedirect("/?status_message=" + status)

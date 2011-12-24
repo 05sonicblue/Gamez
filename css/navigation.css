@@ -22,7 +22,7 @@
 /* menu::base */
 div#menu {
     height:41px;
-    background:url(images/main-bg.png) repeat-x;
+    background:url(navigation_images/main-bg.png) repeat-x;
 }
 
 div#menu ul {
@@ -68,10 +68,10 @@ div#menu span {
 }
 div#menu ul ul a.parent span {
     background-position:95% 8px;
-    background-image: url(images/item-pointer.gif);
+    background-image: url(navigation_images/item-pointer.gif);
 }
 div#menu ul ul a.parent:hover span {
-    background-image: url(images/item-pointer-mover.gif);
+    background-image: url(navigation_images/item-pointer-mover.gif);
 }
 
 /* menu::level1 */
@@ -83,7 +83,7 @@ div#menu a {
 div#menu span {
     margin-top: 5px;
 }/**@replace#1*/
-div#menu li { background: url(images/main-delimiter.png) 98% 4px no-repeat; }
+div#menu li { background: url(navigation_images/main-delimiter.png) 98% 4px no-repeat; }
 div#menu li.last { background: none; }
 
 /* menu::level2 */
@@ -133,8 +133,8 @@ div#menu ul ul ul ul { background: rgb(35,35,35); }
 
 /* lava lamp */
 div#menu li.back {
-    background: url(images/lava.png) no-repeat right -44px !important;
-    background-image: url(images/lava.gif);
+    background: url(navigation_images/lava.png) no-repeat right -44px !important;
+    background-image: url(navigation_images/lava.gif);
     width: 13px;
     height: 44px;
     z-index: 8;
@@ -142,8 +142,33 @@ div#menu li.back {
     margin: -1px 0 0 -5px;
 }
 div#menu li.back .left {
-    background: url(images/lava.png) no-repeat top left !important;
-    background-image: url(images/lava.gif);
+    background: url(navigation_images/lava.png) no-repeat top left !important;
+    background-image: url(navigation_images/lava.gif);
     height: 44px;
     margin-right: 8px;
+}
+
+.statusbar
+{    position: relative;      
+     left: 0px;    
+     right: 0px;    
+     height: 16px;        
+     padding: 5px;     
+     background: black;    
+     color: white;        
+     border: solid 1px lightgray;     
+     opacity: .70;        
+     filter: alpha(opacity="70");    
+     z-index: 200;     
+     overflow: hidden;    
+     overflow-y: hidden; 
+     text-align: center;
+}
+
+.statusbarhighlight
+{    
+    font-weight: bold;    
+    background-color: khaki;    
+    color: Maroon;    
+    border: solid 1px silver;
 }
