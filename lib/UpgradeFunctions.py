@@ -7,8 +7,10 @@ import os
 import urllib2
 import tarfile
 import shutil
+from Logger import LogEvent
 
 def CheckForNewVersion(app_path):
+    LogEvent("Checking to see if a new version is available")
     newVersionAvailable = False
     currentVersion = VersionNumber()
     mostRecentVersion = GetLatestVersion()
@@ -25,6 +27,7 @@ def CheckForNewVersion(app_path):
     return newVersionAvailable
 
 def GetLatestVersion():
+    LogEvent("Retrieving the latest version")
     mostRecentVersion = '0.0.0.0'
     url = 'https://api.github.com/repos/mdlesk/Gamez/tags'
     opener = urllib.FancyURLopener({})
@@ -44,6 +47,7 @@ def GetLatestVersion():
     return mostRecentVersion
 
 def IgnoreVersion(app_path):
+    LogEvent("Ignoring Version")
     versionToIgnore = GetLatestVersion()
     config = ConfigParser.RawConfigParser()
     configFilePath = os.path.join(app_path,'Gamez.ini')
@@ -51,11 +55,12 @@ def IgnoreVersion(app_path):
     if(config.has_section('SystemGenerated') == False):
         config.add_section('SystemGenerated')
     config.set('SystemGenerated','is_to_ignore_update','1')
-    config.set('SystemGenerated','ignored_version','"versionToIgnore"')
+    config.set('SystemGenerated','ignored_version','"' + versionToIgnore + '"')
     with open(configFilePath,'wb') as configFile:
         config.write(configFile)
 
 def UpdateToLatestVersion(app_path):
+    LogEvent("Updating to latest version")
     filesToIgnore = ["Gamez.ini","Gamez.db"]
     filesToIgnoreSet     = set(filesToIgnore)
     updatePath = os.path.join(app_path,"update")
@@ -63,15 +68,18 @@ def UpdateToLatestVersion(app_path):
         os.makedirs(updatePath)
     latestVersion = GetLatestVersion()
     tagUrl = "https://github.com/mdlesk/Gamez/tarball/v" + latestVersion
+    LogEvent("Downloading from GitHub")
     data = urllib2.urlopen(tagUrl)
     downloadPath = os.path.join(app_path,data.geturl().split('/')[-1])
     downloadedFile = open(downloadPath,'wb')
     downloadedFile.write(data.read())
     downloadedFile.close()
+    LogEvent("Extracting files")
     tarredFile = tarfile.open(downloadPath)
     tarredFile.extractall(updatePath)
     tarredFile.close()
     os.remove(downloadPath)
+    LogEvent("Upgrading files")
     contentsDir = [x for x in os.listdir(updatePath) if os.path.isdir(os.path.join(updatePath, x))]
     updatedFilesPath = os.path.join(updatePath,contentsDir[0])
     for dirname, dirnames, filenames in os.walk(updatedFilesPath):
@@ -94,4 +102,5 @@ def UpdateToLatestVersion(app_path):
     config.set('SystemGenerated','ignored_version','"versionToIgnore"')
     with open(configFilePath,'wb') as configFile:
         config.write(configFile)
+    LogEvent("Upgrading complete")
     return "Successfully Upgraded to Version " + latestVersion

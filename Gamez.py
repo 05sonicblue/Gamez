@@ -14,12 +14,15 @@ import ConfigParser
 import cherrypy.process.plugins
 from cherrypy.process.plugins import Daemonizer
 from lib.ConfigFunctions import CheckConfigForAllKeys
+from lib.DBFunctions import ValidateDB
+from lib.Logger import LogEvent
 
 app_path = os.path.dirname(os.path.abspath("__FILE__"))
 config_path = os.path.join(app_path,'Gamez.ini')
 
 class RunApp():
     def RunWebServer(self,isToDaemonize):
+        LogEvent("Generating CherryPy configuration")
         cherrypy.config.update(config_path)
         css_path = os.path.join(app_path,'css')
         images_path = os.path.join(app_path,'images')
@@ -38,11 +41,15 @@ class RunApp():
             }
         daemon = Daemonizer(cherrypy.engine)
         
-        if(isToDaemonize == 1):    
+        if(isToDaemonize == 1):
+            LogEvent("Preparing to run in daemon mode")    
             daemon.subscribe()        
         
+        LogEvent("Generating Post Process Script")
         GenerateSabPostProcessScript()
         RunGameTask()
+
+        LogEvent("Getting download interval from config file and invoking scheduler")
         config = ConfigParser.RawConfigParser()
         config.read('Gamez.ini')
         interval = config.get('Scheduler','download_interval').replace('"','')
@@ -50,8 +57,11 @@ class RunApp():
         workerTask = cherrypy.process.plugins.BackgroundTask(fInterval,RunGameTask)
         try:
             workerTask.start()            
+
+            LogEvent("Starting the Gamez web server")
             cherrypy.quickstart(WebRoot(app_path),'/',config=conf)
         except KeyboardInterrupt:
+            LogEvent("Shutting down Gamez")
             workerTask.cancel()
             if(isToDaemonize == 1):    
                 daemon.unsubscribe()
@@ -103,12 +113,16 @@ def RunGameTask():
         sabnzbdHost = config.get('Sabnzbd','host').replace('"','')
         sabnzbdPort = config.get('Sabnzbd','port').replace('"','')
         sabnzbdApi = config.get('Sabnzbd','api_key').replace('"','')
+        LogEvent("Searching for games")
         lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort)
     except:
         print(sys.exc_info()[0])
 
 if __name__ == '__main__':
+    LogEvent("Checking config file for completeness")
     CheckConfigForAllKeys(app_path)
+    LogEvent("Checking to make sure all tables exist in the database")
+    ValidateDB()
     isToDaemonize = 0
     params = sys.argv
     for param in params:
