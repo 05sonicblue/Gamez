@@ -167,7 +167,6 @@ def UpdateStatus(game_id,status):
     return
 
 def ValidateDB():
-    LogEvent("Checking to make sure database has the correct tables")
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     sql = "select name from sqlite_master where type='table'"
     logTableExists = False
@@ -182,7 +181,6 @@ def ValidateDB():
             logTableExists = True
     cursor.close()
     if(logTableExists == False):
-        LogEvent("Creating table 'gamez_log'")
         sql = "create table gamez_log(ID INTEGER NOT NULL PRIMARY KEY UNIQUE,message TEXT(255) NOT NULL,created_date DATE)"
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()

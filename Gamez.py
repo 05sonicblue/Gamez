@@ -68,7 +68,8 @@ class RunApp():
         
 def GenerateSabPostProcessScript():
     config = ConfigParser.RawConfigParser()
-    config.read('Gamez.ini')
+    print(os.path.join(app_path,'Gamez.ini'))
+    config.read(os.path.join(app_path,'Gamez.ini'))
     gamezWebHost = config.get('global','server.socket_host').replace('"','')
     gamezWebport = config.get('global','server.socket_port').replace('"','')
     gamezBaseUrl = "http://" + gamezWebHost + ":" + gamezWebport + "/"
@@ -119,10 +120,10 @@ def RunGameTask():
         print(sys.exc_info()[0])
 
 if __name__ == '__main__':
+    app_path = sys.path[0]
+    ValidateDB()
     LogEvent("Checking config file for completeness")
     CheckConfigForAllKeys(app_path)
-    LogEvent("Checking to make sure all tables exist in the database")
-    ValidateDB()
     isToDaemonize = 0
     params = sys.argv
     for param in params:
