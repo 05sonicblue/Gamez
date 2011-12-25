@@ -6,6 +6,7 @@ import os
 import shutil
 import stat
 from subprocess import call
+from Logger import LogEvent
 
 class GameTasks():
 
@@ -18,6 +19,7 @@ class GameTasks():
             try:
                 game_name = str(game[0])
                 game_id = str(game[1])
+                LogEvent("Searching for game: " + game_name)
                 nzbmatrixResult = GameTasks().FindGameOnNZBMatrix(game_name,game_id,nzbmatrixusername,nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort)
             except:
                 error = sys.exc_info()[0]
@@ -37,6 +39,7 @@ class GameTasks():
         nzbID = nzbID.replace(";","")
 
         if(nzbID <> "nothing_found"):
+            LogEvent("Game found on NZB Matrix")
             GameTasks().AddNZBToSab(nzbID,game_name,sabnzbdApi,sabnzbdHost,sabnzbdPort,game_id)
             UpdateStatus(game_id,"Snatched")
         return
@@ -47,6 +50,7 @@ class GameTasks():
         responseObject = urllib.FancyURLopener({}).open(url)
         responseObject.read()
         responseObject.close()
+        LogEvent("NZB added to Sabnzbd")
         return
 
     def CheckIfPostProcessExistsInSab(self,sabnzbdApi,sabnzbdHost,sabnzbdPort):
@@ -61,10 +65,12 @@ class GameTasks():
         destPath = os.path.join(scriptDir,"gamezPostProcess.py")
 
         try:
+            LogEvent("Copying post process script to Sabnzbd scripts folder")
             shutil.copyfile(srcPath,destPath)
         except:
             print 'Error Copying File'
         try:
+            LogEvent("Setting permissions on post process script")
             cmd = "chmod +x '" + destPath + "'"
             os.system(cmd)
         except:
