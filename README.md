@@ -5,9 +5,9 @@ Gamez is an automated downloader for video games. The user adds the games they w
 As of the current release, only Wii games are supported.
 
 Current Features:
-+ Local database of all Wii games
-+ Automatically sends NZB's to Sabnzbd
-+ Support for NZBMatrix and Newznab
+	+ Local database of all Wii games
+	+ Automatically sends NZB's to Sabnzbd
+	+ Support for NZBMatrix and Newznab
 
 <hr />
 
