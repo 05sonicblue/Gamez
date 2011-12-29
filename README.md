@@ -10,7 +10,7 @@ Current Features:
 
     * Local database of all Wii games
     * Automatically sends NZB's to Sabnzbd
-    *Support for NZBMatrix and Newznab
+    * Support for NZBMatrix and Newznab
 
 <hr />
 
