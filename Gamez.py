@@ -68,7 +68,6 @@ class RunApp():
         
 def GenerateSabPostProcessScript():
     config = ConfigParser.RawConfigParser()
-    print(os.path.join(app_path,'Gamez.ini'))
     config.read(os.path.join(app_path,'Gamez.ini'))
     gamezWebHost = config.get('global','server.socket_host').replace('"','')
     gamezWebport = config.get('global','server.socket_port').replace('"','')
@@ -114,10 +113,17 @@ def RunGameTask():
         sabnzbdHost = config.get('Sabnzbd','host').replace('"','')
         sabnzbdPort = config.get('Sabnzbd','port').replace('"','')
         sabnzbdApi = config.get('Sabnzbd','api_key').replace('"','')
+        newznabWiiCat = config.get('Newznab','wii_category_id').replace('"','')
+        newznabApi = config.get('Newznab','api_key').replace('"','')
+        newznabHost = config.get('Newznab','host').replace('"','')
+        newznabPort = config.get('Newznab','port').replace('"','')
         LogEvent("Searching for games")
-        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort)
+        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort)
     except:
-        print(sys.exc_info()[0])
+        errorMessage = "Major error occured when running scheduled tasks"
+        for message in sys.exc_info():
+            errorMessage = errorMessage + " - " + str(message)
+        LogEvent(errorMessage)
 
 if __name__ == '__main__':
     app_path = sys.path[0]

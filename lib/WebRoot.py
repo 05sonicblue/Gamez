@@ -6,6 +6,10 @@ from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVers
 import ConfigParser
 from time import sleep
 import urllib
+from xml.dom import minidom
+import base64
+import hashlib
+import random
 
 class WebRoot:
     appPath = ''
@@ -268,7 +272,6 @@ class WebRoot:
                             );
                             $("button").button().click(function(){
                                 var searchText = document.getElementById("search").value;
-                                //alert(searchText);
                                 document.location.href = "search?term=" + searchText;
                             });
                         </script>
@@ -289,6 +292,9 @@ class WebRoot:
                 <label>Download Interval (In Seconds)</label>
                 <input type="text" name="downloadInterval" id="downloadInterval" value='""" + config.get('Scheduler','download_interval').replace('"','') +  """' />
 
+                <label>Gamez API Key</label>
+                <input type="text" name="gamezApiKey" id="gamezApiKey" value='""" + config.get('SystemGenerated','api_key').replace('"','') +  """' />
+
                 <h1>SABnzbd+</h1>
 
                 <label>SABnzbd+ Host</label>
@@ -299,6 +305,7 @@ class WebRoot:
 
                 <label>SABnzbd+ API Key</label>
                 <input type="text" name="sabApi" id="sabApi" value='""" + config.get('Sabnzbd','api_key').replace('"','') +  """' />
+                
 
                 <h1>NZB Matrix</h1>
 
@@ -307,6 +314,21 @@ class WebRoot:
 
                 <label>NZB Matrix Username</label>
                 <input type="text" name="nzbMatrixUsername" id="nzbMatrixUsername" value='""" + config.get('NZBMatrix','username').replace('"','') +  """' />
+
+
+                <h1>Newznab</h1>
+
+                <label>Newznab Host</label>
+                <input type="text" name="newznabHost" id="newznabHost" value='""" + config.get('Newznab','host').replace('"','') +  """' />
+
+                <label>Newznab Port</label>
+                <input type="text" name="newznabPort" id="newznabPort" value='""" + config.get('Newznab','port').replace('"','') +  """' />
+
+                <label>Newznab API Key</label>
+                <input type="text" name="newznabApi" id="newznabApi" value='""" + config.get('Newznab','api_key').replace('"','') +  """' />
+
+                <label>Newznab Wii Category ID</label>
+                <input type="text" name="newznabWiiCat" id="newznabWiiCat" value='""" + config.get('Newznab','wii_category_id').replace('"','') +  """' />
 
                 <button type="submit">Save Settings</button>
                 <div class="spacer"></div>
@@ -378,7 +400,6 @@ class WebRoot:
                             );
                             $("button").button().click(function(){
                                 var searchText = document.getElementById("search").value;
-                                //alert(searchText);
                                 document.location.href = "search?term=" + searchText;
                             });
                         </script>
@@ -459,12 +480,16 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
         sabApi = '"' + sabApi + '"'
         sabHost = '"' + sabHost + '"'
+        gamezApiKey = '"' + gamezApiKey + '"'
+        newznabHost = '"' + newznabHost + '"'
+        newznabApi = '"' + newznabApi + '"'
+        newznabWiiCat = '"' + newznabWiiCat + '"'
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
@@ -476,6 +501,11 @@ class WebRoot:
         config.set('Sabnzbd','port',sabPort)
         config.set('Sabnzbd','api_key',sabApi)
         config.set('Scheduler','download_interval',downloadInterval)
+        config.set('SystemGenerated','api_key',gamezApiKey)
+        config.set('Newznab','host',newznabHost)
+        config.set('Newznab','port',newznabPort)
+        config.set('Newznab','wii_category_id',newznabWiiCat)
+        config.set('Newznab','api_key',newznabApi)
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)
         status = "Application Settings Updated Successfully. Gamez is restarting. If after 5 seconds, Gamez isn't working, update the Gamez.ini file and re-launch Gamez"
@@ -485,3 +515,18 @@ class WebRoot:
     def clearlog(self):
         ClearDBLog()
         raise cherrypy.InternalRedirect('/') 
+
+    @cherrypy.expose
+    def api(self,api_key=''):
+        config = ConfigParser.RawConfigParser()
+        configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
+        config.read(configFilePath)
+        systemApiKey = config.get('SystemGenerated','api_key').replace('"','')
+        if(api_key == ''):
+            return json.dumps({"Error" : "API Key Required"})
+        elif(api_key <> systemApiKey):
+            return json.dumps({"Error" : "Invalid API Key"})
+        else:
+            response = {"Error" : "API Not Yet Implemented"}
+            return json.dumps(response)
+        return json.dumps({"Error" : "Unkown Error"})

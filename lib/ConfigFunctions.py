@@ -1,5 +1,8 @@
 import ConfigParser
 import os
+import base64
+import hashlib
+import random
 
 def CheckConfigForAllKeys(app_path):
     changesMade = False
@@ -25,6 +28,10 @@ def CheckConfigForAllKeys(app_path):
 
     if(config.has_section('SystemGenerated') == False):
         config.add_section('SystemGenerated')
+        changesMade = True
+
+    if(config.has_section('Newznab') == False):
+        config.add_section('Newznab')
         changesMade = True
      
     if(config.has_option('global','server.socket_host') == False):
@@ -65,6 +72,27 @@ def CheckConfigForAllKeys(app_path):
 
     if(config.has_option('SystemGenerated','ignored_version') == False):
         config.set('SystemGenerated','ignored_version','""')
+        changesMade = True
+
+    if(config.has_option('SystemGenerated','api_key') == False):
+        apiKey = base64.b64encode(hashlib.sha256( str(random.getrandbits(256)) ).digest(), random.choice(['rA','aZ','gQ','hH','hG','aR','DD'])).rstrip('==')
+        config.set('SystemGenerated','api_key','"' + apiKey + '"')
+        changesMade = True
+
+    if(config.has_option('Newznab','api_key') == False):
+        config.set('Newznab','api_key','""')
+        changesMade = True
+
+    if(config.has_option('Newznab','wii_category_id') == False):
+        config.set('Newznab','wii_category_id','"1030"')
+        changesMade = True
+
+    if(config.has_option('Newznab','host') == False):
+        config.set('Newznab','host','""')
+        changesMade = True
+
+    if(config.has_option('Newznab','port') == False):
+        config.set('Newznab','port','')
         changesMade = True
 
     if(changesMade):

@@ -192,7 +192,7 @@ def ValidateDB():
 def AddEventToDB(message):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     createdDate = datetime.datetime.now()
-    sql = "INSERT INTO gamez_log (message,created_date) values('" + message + "',datetime())"
+    sql = "INSERT INTO gamez_log (message,created_date) values('" + message.replace("'","''") + "',datetime())"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
