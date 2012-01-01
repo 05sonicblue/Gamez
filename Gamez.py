@@ -3,7 +3,6 @@
 import cherrypy
 import os
 from lib.WebRoot import WebRoot
-from lib.WebBrowseWii import WebBrowseWii
 import sys
 import sched
 import time
