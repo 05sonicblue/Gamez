@@ -350,6 +350,9 @@ class WebRoot:
                 <label>Newznab Wii Category ID</label>
                 <input type="text" name="newznabWiiCat" id="newznabWiiCat" value='""" + config.get('Newznab','wii_category_id').replace('"','') +  """' />
 
+                <label>Newznab Xbox 360 Category ID</label>
+                <input type="text" name="newznabXbox360Cat" id="newznabXbox360Cat" value='""" + config.get('Newznab','xbox360_category_id').replace('"','') +  """' />
+
                 <button type="submit">Save Settings</button>
                 <div class="spacer"></div>
 
@@ -506,7 +509,7 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
@@ -516,6 +519,7 @@ class WebRoot:
         newznabHost = '"' + newznabHost + '"'
         newznabApi = '"' + newznabApi + '"'
         newznabWiiCat = '"' + newznabWiiCat + '"'
+        newznabXbox360Cat = '"' + newznabXbox360Cat + '"'
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
@@ -531,6 +535,7 @@ class WebRoot:
         config.set('Newznab','host',newznabHost)
         config.set('Newznab','port',newznabPort)
         config.set('Newznab','wii_category_id',newznabWiiCat)
+        config.set('Newznab','xbox360_category_id',newznabXbox360Cat)
         config.set('Newznab','api_key',newznabApi)
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)
