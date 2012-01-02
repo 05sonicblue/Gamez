@@ -60,7 +60,7 @@ def AddGameToDb(db_id,status):
     system = str(result[1])
     game_type = str(result[2])
     cursor.close()
-    sql = "insert into requested_games(GAME_NAME,SYSTEM,GAME_TYPE,status) values('" + game_name + "','" + system + "','" + game_type + "','" + status + "')"
+    sql = "insert into requested_games(GAME_NAME,SYSTEM,GAME_TYPE,status) values('" + game_name.replace("'","''") + "','" + system + "','" + game_type + "','" + status + "')"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
