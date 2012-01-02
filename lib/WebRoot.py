@@ -1,7 +1,7 @@
 import cherrypy
 import json
 import os
-from DBFunctions import GetWiiGamesFromTerm, GetWiiGameDataFromTerm, AddWiiGameToDb, GetRequestedGames, RemoveWiiGameFromDb, UpdateStatus, GetLog, ClearDBLog
+from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing
 from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVersion
 import ConfigParser
 from time import sleep
@@ -26,6 +26,7 @@ class WebRoot:
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
         <html>
           <head>
+            <title>Gamez :: Home</title>
             <link rel="stylesheet" type="text/css" href="css/navigation.css" />
             <link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css" />
             <link rel="stylesheet" type="text/css" href="css/datatables.css" />
@@ -62,6 +63,11 @@ class WebRoot:
                             Log
                         </a>
                     </li>
+                    <li class="parent">
+                        <a href="/updategamelist">
+                            Update Game List
+                        </a>
+                    </li>
                 </ul>
                 <div style="text-align:right;margin-right:20px">
                     <div class=ui-widget>
@@ -71,7 +77,7 @@ class WebRoot:
                         <script>
                             $("#search").autocomplete(
                                 {
-                                    source:"/get_wii_game_list/",
+                                    source:"/get_game_list/",
                                     minChars: 1,
                                     max:25,
                                     dataType:'json'
@@ -99,7 +105,8 @@ class WebRoot:
                   <tr>
                     <th>Actions</th>
                     <th>Game Name</th>
-                    <th>Game ID</th>
+                    <th>Game Type</th>
+                    <th>System</th>
                     <th>Status</th>
                     <th>Update Status</th>
                   </tr>
@@ -131,6 +138,7 @@ class WebRoot:
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
         <html>
           <head>
+            <title>Gamez :: Search</title>
             <link rel="stylesheet" type="text/css" href="css/navigation.css" />
             <link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css" />
             <link rel="stylesheet" type="text/css" href="css/datatables.css" />
@@ -158,6 +166,11 @@ class WebRoot:
                             Log
                         </a>
                     </li>
+                    <li class="parent">
+                        <a href="/updategamelist">
+                            Update Game List
+                        </a>
+                    </li>
                 </ul>
                <div style="text-align:right;margin-right:20px">
                     <div class=ui-widget>
@@ -167,7 +180,7 @@ class WebRoot:
                         <script>
                             $("#search").autocomplete(
                                 {
-                                    source:"/get_wii_game_list/",
+                                    source:"/get_game_list/",
                                     minChars: 1,
                                     max:25,
                                     dataType:'json'
@@ -184,7 +197,7 @@ class WebRoot:
             </div>
             <div style="visibility:hidden"><a href="http://apycom.com/">jQuery Menu by Apycom</a></div>
             <div id="container">"""
-        db_result = GetWiiGameDataFromTerm(term)
+        db_result = GetGameDataFromTerm(term)
         if(db_result == ''):
             html  = html + """No Results Found. Try Searching Again"""
         else:
@@ -194,7 +207,8 @@ class WebRoot:
                   <tr>
                     <th>Download</th>
                     <th>Game Name</th>
-                    <th>Game ID</th>
+                    <th>Game Type</th>
+                    <th>System</th>
                   </tr>
                 </thead>
                 <tbody>"""
@@ -227,6 +241,7 @@ class WebRoot:
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
         <html>
           <head>
+            <title>Gamez :: Settings</title>
             <link rel="stylesheet" type="text/css" href="css/navigation.css" />
             <link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css" />
             <link rel="stylesheet" type="text/css" href="css/datatables.css" />
@@ -255,6 +270,11 @@ class WebRoot:
                             Log
                         </a>
                     </li>
+                    <li class="parent">
+                        <a href="/updategamelist">
+                            Update Game List
+                        </a>
+                    </li>
                 </ul>
                 <div style="text-align:right;margin-right:20px">
                     <div class=ui-widget>
@@ -264,7 +284,7 @@ class WebRoot:
                         <script>
                             $("#search").autocomplete(
                                 {
-                                    source:"/get_wii_game_list/",
+                                    source:"/get_game_list/",
                                     minChars: 1,
                                     max:25,
                                     dataType:'json'
@@ -355,6 +375,7 @@ class WebRoot:
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
         <html>
           <head>
+            <title>Gamez :: Log</title>
             <link rel="stylesheet" type="text/css" href="css/navigation.css" />
             <link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css" />
             <link rel="stylesheet" type="text/css" href="css/datatables.css" />
@@ -383,6 +404,11 @@ class WebRoot:
                             Log
                         </a>
                     </li>
+                    <li class="parent">
+                        <a href="/updategamelist">
+                            Update Game List
+                        </a>
+                    </li>
                 </ul>
                 <div style="text-align:right;margin-right:20px">
                     <div class=ui-widget>
@@ -392,7 +418,7 @@ class WebRoot:
                         <script>
                             $("#search").autocomplete(
                                 {
-                                    source:"/get_wii_game_list/",
+                                    source:"/get_game_list/",
                                     minChars: 1,
                                     max:25,
                                     dataType:'json'
@@ -448,23 +474,23 @@ class WebRoot:
         raise cherrypy.InternalRedirect('/')
 
     @cherrypy.expose
-    def get_wii_game_list(self,term=''):
+    def get_game_list(self,term=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
-        return GetWiiGamesFromTerm(term)
+        return GetGamesFromTerm(term)
 
     @cherrypy.expose
     def addgame(self,dbid): 
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
-        AddWiiGameToDb(dbid,'Wanted')
+        AddGameToDb(dbid,'Wanted')
         raise cherrypy.InternalRedirect('/')
 
     @cherrypy.expose
     def removegame(self,dbid):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
-        RemoveWiiGameFromDb(dbid)
+        RemoveGameFromDb(dbid)
         raise cherrypy.InternalRedirect('/')
 
     @cherrypy.expose
@@ -529,4 +555,12 @@ class WebRoot:
         else:
             response = {"Error" : "API Not Yet Implemented"}
             return json.dumps(response)
-        return json.dumps({"Error" : "Unkown Error"})
+        return json.dumps({"Error" : "Unkown Error"})     
+
+    @cherrypy.expose
+    def updategamelist(self):
+        AddWiiGamesIfMissing()
+        #TODO: Add Other Systems
+        #TODO: Copy requested from old structure to new structure
+        status = "Game list has been updated successfully"
+        raise cherrypy.InternalRedirect("/?status_message=" + status)

@@ -3,10 +3,12 @@ import sqlite3
 import sys
 import datetime
 from Logger import LogEvent
+import urllib
+import json
 
-def GetAllWiiGames():
+def GetGamesFromTerm(term):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = 'SELECT game_name,ID,game_id FROM wii_games order by game_name asc'
+    sql = "SELECT GAME_NAME,SYSTEM FROM GAMES where game_name like '%" + term.replace("'","''") + "%' ORDER BY GAME_NAME ASC"
     data = ""
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -15,56 +17,7 @@ def GetAllWiiGames():
     for record in result:
         try:
             game_name = str(record[0])
-            game_name.replace("'","''")
-            id = str(record[1])
-            game_id = str(record[2])
-            rowdata = id + "::" + game_id + "::" + game_name + "\r\n"
-            data = data + rowdata + "||"
-            #{db_id:"1", nintendo_id:"RVDX01", game_title:"Super Mario Bros."},
-        except:
-            continue
-    cursor.close()
-    data = data[:-2]
-    return data
-
-
-
-def GetWiiGameList():
-    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = 'SELECT distinct game_name FROM wii_games order by game_name asc'
-    data = ""
-    connection = sqlite3.connect(db_path)
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    for record in result:
-        try:
-            game_name = str(record[0])
-            game_name.replace("'","''")
-            id = str(record[1])
-            game_id = str(record[2])
-            rowdata = id + "::" + game_id + "::" + game_name + "\r\n"
-            data = data + rowdata + "||"
-            #{db_id:"1", nintendo_id:"RVDX01", game_title:"Super Mario Bros."},
-        except:
-            continue
-    cursor.close()
-    data = data[:-2]
-    return data
-
-#Below are the only ones currently used
-
-def GetWiiGamesFromTerm(term):
-    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT distinct game_name FROM wii_games where game_name like '%" + term.replace("'","''") + "%' order by game_name asc"
-    data = ""
-    connection = sqlite3.connect(db_path)
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    for record in result:
-        try:
-            game_name = str(record[0])
+            system = str(record[1])
             rowdata = '{"value":"' + game_name + '"},'
             data = data + rowdata
         except:
@@ -74,9 +27,9 @@ def GetWiiGamesFromTerm(term):
     data = "[" + data + "]"
     return data
 
-def GetWiiGameDataFromTerm(term):
+def GetGameDataFromTerm(term):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT game_name,game_id,id FROM wii_games where game_name like '%" + term.replace("'","''") + "%' order by game_name asc"
+    sql = "SELECT game_name,game_type,id,system FROM games where game_name like '%" + term.replace("'","''") + "%' order by game_name asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -84,21 +37,30 @@ def GetWiiGameDataFromTerm(term):
     result = cursor.fetchall()
     for record in result:
         try:
-            #<tr><td>Trident</td><td>Internet Explorer 4.0</td><td>Win 95+</td></tr>
             game_name = str(record[0])
-            game_id = str(record[1])
+            game_type = str(record[1])
             db_id = str(record[2])
-            rowdata = "<tr><td><a href='addgame?dbid=" + db_id + "'>Download</a></td><td>" + game_name + "</td><td>" + game_id + "</td></tr>"
+            system = str(record[3])
+            rowdata = "<tr><td><a href='addgame?dbid=" + db_id + "'>Download</a></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td></tr>"
             data = data + rowdata
         except:
             continue
     cursor.close()
     return data
 
-def AddWiiGameToDb(db_id,status):
+def AddGameToDb(db_id,status):
     LogEvent("Adding game in 'Wanted' status")
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "insert into requested_games(WiiGameID,status) select '" + db_id + "','" + status + "' where not exists(select 1 from requested_games where WiiGameID='" + db_id + "')"
+    sql = "select game_name,system,game_type from games where ID = '" + db_id + "'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()[0]
+    game_name = str(result[0])
+    system = str(result[1])
+    game_type = str(result[2])
+    cursor.close()
+    sql = "insert into requested_games(GAME_NAME,SYSTEM,GAME_TYPE,status) values('" + game_name + "','" + system + "','" + game_type + "','" + status + "')"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -108,7 +70,7 @@ def AddWiiGameToDb(db_id,status):
 
 def GetRequestedGames():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT wii_games.id,game_name,game_id,status FROM requested_games inner join wii_games on requested_games.WiiGameID = wii_games.ID  order by game_name asc"
+    sql = "SELECT id,game_name,game_type,status,system FROM requested_games order by game_name asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -118,9 +80,10 @@ def GetRequestedGames():
         try:
             db_id = str(record[0])
             game_name = str(record[1])
-            game_id = str(record[2])
+            game_type = str(record[2])
             status = str(record[3])
-            rowdata = "<tr><td><a href='removegame?dbid=" + db_id + "'>Delete</a></td><td>" + game_name + "</td><td>" + game_id + "</td><td>" + status + "</td><td><select id=updateSatusSelectObject class=ui-widget onchange=UpdateGameStatus(this.options[this.selectedIndex].value,'" + db_id + "')>"
+            system = str(record[4])
+            rowdata = "<tr><td><a href='removegame?dbid=" + db_id + "'>Delete</a></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td><td>" + status + "</td><td><select id=updateSatusSelectObject class=ui-widget onchange=UpdateGameStatus(this.options[this.selectedIndex].value,'" + db_id + "')>"
             if(status == "Snatched"):
                 rowdata = rowdata + "<option>Downloaded</option><option selected=true>Snatched</option><option>Wanted</option>"
             elif(status == "Downloaded"):
@@ -134,10 +97,10 @@ def GetRequestedGames():
     cursor.close()
     return data
 
-def RemoveWiiGameFromDb(db_id):
+def RemoveGameFromDb(db_id):
     LogEvent("Removing game")
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "delete from requested_games where WiiGameID='" + db_id + "'"
+    sql = "delete from requested_games where ID='" + db_id + "'"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -147,7 +110,7 @@ def RemoveWiiGameFromDb(db_id):
 
 def GetRequestedGamesAsArray():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT game_name,WiiGameID FROM requested_games inner join wii_games on requested_games.WiiGameID = wii_games.ID WHERE status='Wanted'  order by game_name asc"
+    sql = "SELECT game_name,ID FROM requested_games WHERE status='Wanted' order by game_name asc"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -158,7 +121,7 @@ def GetRequestedGamesAsArray():
 def UpdateStatus(game_id,status):
     LogEvent("Update status of game to " + status)
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "update requested_games set status='" + status + "' where WiiGameID='" + game_id + "'"
+    sql = "update requested_games set status='" + status + "' where ID='" + game_id + "'"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -170,6 +133,7 @@ def ValidateDB():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     sql = "select name from sqlite_master where type='table'"
     logTableExists = False
+    oldWiiGamesTableExists = False
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -179,6 +143,8 @@ def ValidateDB():
         tableName = str(record[0])
         if(tableName == 'gamez_log'):
             logTableExists = True
+        elif(tableName == 'wii_games'):
+            oldWiiGamesTableExists = True
     cursor.close()
     if(logTableExists == False):
         sql = "create table gamez_log(ID INTEGER NOT NULL PRIMARY KEY UNIQUE,message TEXT(255) NOT NULL,created_date DATE)"
@@ -187,6 +153,72 @@ def ValidateDB():
         cursor.execute(sql)
         connection.commit()
         cursor.close()
+    sql = "PRAGMA table_info(requested_games);"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    isRequestedGamesOldFormat = False
+    for record in result:
+        if(str(record[1]) == "WiiGameID"):
+            isRequestedGamesOldFormat = True
+    cursor.close()
+    if(isRequestedGamesOldFormat):
+        sql = "select wii_games.game_name,requested_games.status from requested_games inner join wii_games on requested_games.WiiGameID = wii_games.ID"
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        cursor.close()
+
+        #drop table
+        sql = "drop table requested_games"
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        cursor.close()
+
+        #create table in new format
+        sql = "CREATE TABLE REQUESTED_GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT,STATUS TEXT)"
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        cursor.close()
+
+        for record in result:
+            game_name = str(record[0])
+            status = str(record[1])
+            #insert into new table
+            sql = "insert into requested_games (game_name,game_type,system,status) values ('" + game_name.replace("'","''") + "','Game','Wii','" + status + "')"
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            connection.commit()
+            cursor.close()
+    
+    if(oldWiiGamesTableExists):
+        print "Upgrading database. This may take a few moments"
+        sql = "drop table wii_games"
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        cursor.close()
+
+        #create table in new format
+        sql = "CREATE TABLE GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT)"
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        cursor.close()
+
+        #Populate with data
+        AddWiiGamesIfMissing()
+        print "Database upgrade complete"
+
     return
 
 def AddEventToDB(message):
@@ -229,3 +261,45 @@ def ClearDBLog():
     connection.commit()
     cursor.close()
     return
+
+def ClearWiiGames():
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "delete from games where system = 'Wii'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    connection.commit()
+    cursor.close()
+    return
+
+def AddWiiGamesIfMissing():
+        wiiWebServiceUrl = "http://www.gamezapp.org/webservice/wii"
+        response = ''
+        try:
+            responseObject = urllib.FancyURLopener({}).open(wiiWebServiceUrl)
+            response = responseObject.read()
+            responseObject.close()
+        except:
+            LogEvent("Unable to connect to web service: " + wiiWebServiceUrl)
+            return
+        json_data = json.loads(response)
+        ClearWiiGames()
+        for data in json_data:
+            game_name = data['GameTitle']
+            game_type = data['GameType'] 
+            db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+            sql = "SELECT count(ID) from games where game_name = '" + game_name.replace("'","''") + "'"
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            result = cursor.fetchall()    
+            recordCount = result[0][0] 
+            cursor.close()
+            if(str(recordCount) == "0"):
+                LogEvent("Adding Wii Game [" + game_name.replace("'","''") + "] to Game List")
+                sql = "INSERT INTO games (game_name,game_type,system) values('" + game_name.replace("'","''") + "','" + game_type + "','Wii')"
+                cursor = connection.cursor()
+                cursor.execute(sql)
+                connection.commit()
+                cursor.close()       
+        return
