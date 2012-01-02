@@ -87,6 +87,10 @@ def CheckConfigForAllKeys(app_path):
         config.set('Newznab','wii_category_id','"1030"')
         changesMade = True
 
+    if(config.has_option('Newznab','xbox360_category_id') == False):
+        config.set('Newznab','xbox360_category_id','"1050"')
+        changesMade = True
+
     if(config.has_option('Newznab','host') == False):
         config.set('Newznab','host','""')
         changesMade = True

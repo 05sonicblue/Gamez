@@ -10,7 +10,7 @@ from Logger import LogEvent
 
 class GameTasks():
 
-    def FindGames(self, nzbmatrixusername, nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort):
+    def FindGames(self, nzbmatrixusername, nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat):
         GameTasks().CheckIfPostProcessExistsInSab(sabnzbdApi,sabnzbdHost,sabnzbdPort)
         nzbmatrixusername = nzbmatrixusername.replace('"','')
         nzbmatrixapi = nzbmatrixapi.replace('"','')
@@ -21,23 +21,31 @@ class GameTasks():
             try:
                 game_name = str(game[0])
                 game_id = str(game[1])
+                system = str(game[2])
                 LogEvent("Searching for game: " + game_name)
                 isDownloaded = False
 
                 if(nzbmatrixusername <> '' and nzbmatrixapi <> ''):
                     LogEvent("Checking for game [" + game_name + "] on NZB Matrix")
-                    isDownloaded = GameTasks().FindGameOnNZBMatrix(game_name,game_id,nzbmatrixusername,nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort)
+                    isDownloaded = GameTasks().FindGameOnNZBMatrix(game_name,game_id,nzbmatrixusername,nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort,system)
                 
-                if(newznabWiiCat <> '' and newznabWiiApi <> '' and newznabHost <> '' and newznabPort <> ''):
+                if(newznabWiiCat <> '' and newznabXbox360Cat <> '' and newznabApi <> '' and newznabHost <> '' and newznabPort <> ''):
                     if(isDownloaded == False):
                         LogEvent("Checking for game [" + game_name + "] on Newznab")
-                        isDownloaded = FindGameOnNewznabServer(game_name,game_id,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort)
+                        isDownloaded = FindGameOnNewznabServer(game_name,game_id,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,system,newznabXbox360Cat)
             except:
                 continue
         return
 
-    def FindGameOnNZBMatrix(self,game_name,game_id,username,api,sabnzbdApi,sabnzbdHost,sabnzbdPort):
-        url = "http://api.nzbmatrix.com/v1.1/search.php?search=" + game_name + "&num=1&cat=44&username=" + username + "&apikey=" + api
+    def FindGameOnNZBMatrix(self,game_name,game_id,username,api,sabnzbdApi,sabnzbdHost,sabnzbdPort,system):
+        if(system == "Wii"):
+            catToUse = "44"
+        elif(systyem == "Xbox360"):
+            catToUse = "14"
+        else:
+            LogEvent("Unrecognized System")
+            return False
+        url = "http://api.nzbmatrix.com/v1.1/search.php?search=" + game_name + "&num=1&cat=" + catToUse + "&username=" + username + "&apikey=" + api
         try:
             opener = urllib.FancyURLopener({})
             responseObject = opener.open(url)
@@ -64,8 +72,15 @@ class GameTasks():
             LogEvent("Error getting game [" + game_name + "] from NZB Matrix")
             return False
 
-    def FindGameOnNewznabServer(self,game_name,game_id,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort):
-        url = "http://" + newznabHost + ":" + newznabPort + "/api?apikey=" + newznabApi + "&t=search&cat=" + newznabWiiCat + "&q=" + game_name + "&o=json"
+    def FindGameOnNewznabServer(self,game_name,game_id,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,system,newznabXbox360Cat):
+        if(system == "Wii"):
+            catToUse = newznabWiiCat
+        elif(system == "Xbox360"):
+            catToUse = newznabXbox360Cat
+        else:
+            LogEvent("Unrecognized System")
+            return False
+        url = "http://" + newznabHost + ":" + newznabPort + "/api?apikey=" + newznabApi + "&t=search&cat=" + catToUse + "&q=" + game_name + "&o=json"
         try:
             opener = urllib.FancyURLopener({})
             responseObject = opener.open(url)

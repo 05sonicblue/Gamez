@@ -1,7 +1,7 @@
 import cherrypy
 import json
 import os
-from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing
+from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing
 from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVersion
 import ConfigParser
 from time import sleep
@@ -560,7 +560,6 @@ class WebRoot:
     @cherrypy.expose
     def updategamelist(self):
         AddWiiGamesIfMissing()
-        #TODO: Add Other Systems
-        #TODO: Copy requested from old structure to new structure
+        AddXbox360GamesIfMissing()
         status = "Game list has been updated successfully"
         raise cherrypy.InternalRedirect("/?status_message=" + status)

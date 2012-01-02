@@ -110,7 +110,7 @@ def RemoveGameFromDb(db_id):
 
 def GetRequestedGamesAsArray():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT game_name,ID FROM requested_games WHERE status='Wanted' order by game_name asc"
+    sql = "SELECT game_name,ID,system FROM requested_games WHERE status='Wanted' order by game_name asc"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -170,27 +170,21 @@ def ValidateDB():
         cursor.execute(sql)
         result = cursor.fetchall()
         cursor.close()
-
-        #drop table
         sql = "drop table requested_games"
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute(sql)
         connection.commit()
         cursor.close()
-
-        #create table in new format
         sql = "CREATE TABLE REQUESTED_GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT,STATUS TEXT)"
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute(sql)
         connection.commit()
         cursor.close()
-
         for record in result:
             game_name = str(record[0])
             status = str(record[1])
-            #insert into new table
             sql = "insert into requested_games (game_name,game_type,system,status) values ('" + game_name.replace("'","''") + "','Game','Wii','" + status + "')"
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
@@ -206,16 +200,12 @@ def ValidateDB():
         cursor.execute(sql)
         connection.commit()
         cursor.close()
-
-        #create table in new format
         sql = "CREATE TABLE GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT)"
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute(sql)
         connection.commit()
         cursor.close()
-
-        #Populate with data
         AddWiiGamesIfMissing()
         print "Database upgrade complete"
 
@@ -262,9 +252,9 @@ def ClearDBLog():
     cursor.close()
     return
 
-def ClearWiiGames():
+def ClearGames(system):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "delete from games where system = 'Wii'"
+    sql = "delete from games where system = '" + system + "'"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -283,12 +273,12 @@ def AddWiiGamesIfMissing():
             LogEvent("Unable to connect to web service: " + wiiWebServiceUrl)
             return
         json_data = json.loads(response)
-        ClearWiiGames()
+        ClearGames("Wii")
         for data in json_data:
             game_name = data['GameTitle']
             game_type = data['GameType'] 
             db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-            sql = "SELECT count(ID) from games where game_name = '" + game_name.replace("'","''") + "'"
+            sql = "SELECT count(ID) from games where game_name = '" + game_name.replace("'","''") + "' AND system='Wii'"
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
             cursor.execute(sql)
@@ -303,3 +293,35 @@ def AddWiiGamesIfMissing():
                 connection.commit()
                 cursor.close()       
         return
+
+def AddXbox360GamesIfMissing():
+    url = "http://www.gamezapp.org/webservice/xbox360"
+    response = ''
+    try:
+        responseObject = urllib.FancyURLopener({}).open(url)
+        response = responseObject.read()
+        responseObject.close()
+    except:
+        LogEvent("Unable to connect to web service: " + url)
+        return
+    json_data = json.loads(response)
+    ClearGames("Xbox360")
+    for data in json_data:
+        game_name = data['GameTitle']
+        game_type = data['GameType'] 
+        db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+        sql = "SELECT count(ID) from games where game_name = '" + game_name.replace("'","''") + "' AND system='Xbox360'"
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        result = cursor.fetchall()    
+        recordCount = result[0][0] 
+        cursor.close()
+        if(str(recordCount) == "0"):
+            LogEvent("Adding XBOX 360 Game [" + game_name.replace("'","''") + "] to Game List")
+            sql = "INSERT INTO games (game_name,game_type,system) values('" + game_name.replace("'","''") + "','" + game_type + "','Xbox360')"
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            connection.commit()
+            cursor.close()       
+    return
