@@ -1,7 +1,7 @@
 import cherrypy
 import json
 import os
-from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing
+from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,ApiGetGamesFromTerm
 from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVersion
 import ConfigParser
 from time import sleep
@@ -548,7 +548,7 @@ class WebRoot:
         raise cherrypy.InternalRedirect('/') 
 
     @cherrypy.expose
-    def api(self,api_key=''):
+    def api(self,api_key='',mode='',term='',system=''):
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
@@ -558,7 +558,19 @@ class WebRoot:
         elif(api_key <> systemApiKey):
             return json.dumps({"Error" : "Invalid API Key"})
         else:
-            response = {"Error" : "API Not Yet Implemented"}
+            if(mode == 'search'):
+                return ApiGetGamesFromTerm(term,system)
+            else:
+                response = {"Error" : mode + " Mode Not Implemented"}
+
+            #TODO: Get List of requested games
+
+            #TODO: Add Game to requested list
+
+            #TODO: Remove game from requested list
+
+            #TODO: Update game list from gamezapp.org web service
+
             return json.dumps(response)
         return json.dumps({"Error" : "Unkown Error"})     
 

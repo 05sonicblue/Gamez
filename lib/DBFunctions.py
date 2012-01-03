@@ -325,3 +325,24 @@ def AddXbox360GamesIfMissing():
             connection.commit()
             cursor.close()       
     return
+
+def ApiGetGamesFromTerm(term,system):
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "SELECT GAME_NAME,SYSTEM FROM GAMES where game_name like '%" + term.replace("'","''") + "%' AND SYSTEM LIKE '%" + system + "%' ORDER BY GAME_NAME ASC"
+    data = ""
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    for record in result:
+        try:
+            game_name = str(record[0])
+            system = str(record[1])
+            rowdata = '{"GameTitle":"' + game_name + '","System":"' + system + '"},'
+            data = data + rowdata
+        except:
+            continue
+    cursor.close()
+    data = data[:-1]
+    data = "[" + data + "]"
+    return data
