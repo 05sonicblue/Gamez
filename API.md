@@ -22,7 +22,8 @@ API_KEY - The Gamez API Key (Can be retrieved from Settings page)
 MODE - The type of request. Valid values: ["search"]
 TERM - Used with search and should be part of the game name
 SYSTEM - The name of the system corresponding with the action
-</hr>
+
+<hr />
 *Modes*
 
 ***SEARCH***
@@ -31,4 +32,5 @@ This mode searches for a game. A json response will be returned containing all g
 Examples:
 Get list of all games: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=search
 Search for games that contain "Super" and are only for the Wii: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=search&term=super&system=wii
+
 </hr>
