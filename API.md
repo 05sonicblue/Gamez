@@ -25,7 +25,7 @@ SYSTEM - The name of the system corresponding with the action
 </hr>
 *Modes*
 
-**SEARCH**
+***SEARCH***
 This mode searches for a game. A json response will be returned containing all games matching the search term. The term parameter should be supplied. If it is blank or not supplied, all games will be returned
 
 Examples:
