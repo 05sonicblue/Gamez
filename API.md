@@ -13,7 +13,7 @@ If the URL is accessed without any parameters, an error will be returned in the 
 
 The API Key is a required parameter
 
-Currently, no API actions are implemented.
+Currently, Only Search API actions are implemented.
 
 <hr />
 *Parameters*
