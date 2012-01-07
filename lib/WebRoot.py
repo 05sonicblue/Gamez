@@ -104,6 +104,7 @@ class WebRoot:
                 <thead>
                   <tr>
                     <th>Actions</th>
+		    <th>Cover</th>
                     <th>Game Name</th>
                     <th>Game Type</th>
                     <th>System</th>
@@ -206,6 +207,7 @@ class WebRoot:
                 <thead>
                   <tr>
                     <th>Download</th>
+                    <th>Cover</th>
                     <th>Game Name</th>
                     <th>Game Type</th>
                     <th>System</th>
@@ -353,7 +355,14 @@ class WebRoot:
                 <label>Newznab Xbox 360 Category ID</label>
                 <input type="text" name="newznabXbox360Cat" id="newznabXbox360Cat" value='""" + config.get('Newznab','xbox360_category_id').replace('"','') +  """' />
 
-                <button type="submit">Save Settings</button>
+                
+		<h1>Notifications</h1>
+
+		<label>Prowl API</label>
+                <input type="text" name="prowlApi" id="prowlApi" value='""" + config.get('Notifications','prowl_api').replace('"','') +  """' />
+
+
+		<button type="submit">Save Settings</button>
                 <div class="spacer"></div>
 
                 
@@ -509,7 +518,7 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
@@ -520,6 +529,7 @@ class WebRoot:
         newznabApi = '"' + newznabApi + '"'
         newznabWiiCat = '"' + newznabWiiCat + '"'
         newznabXbox360Cat = '"' + newznabXbox360Cat + '"'
+	prowlApi = '"' + prowlApi + '"'
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
@@ -537,6 +547,7 @@ class WebRoot:
         config.set('Newznab','wii_category_id',newznabWiiCat)
         config.set('Newznab','xbox360_category_id',newznabXbox360Cat)
         config.set('Newznab','api_key',newznabApi)
+	config.set('Notifications','prowl_api',prowlApi)
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)
         status = "Application Settings Updated Successfully. Gamez is restarting. If after 5 seconds, Gamez isn't working, update the Gamez.ini file and re-launch Gamez"

@@ -29,7 +29,7 @@ def GetGamesFromTerm(term):
 
 def GetGameDataFromTerm(term):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT game_name,game_type,id,system FROM games where game_name like '%" + term.replace("'","''") + "%' order by game_name asc"
+    sql = "SELECT game_name,game_type,id,system,cover FROM games where game_name like '%" + term.replace("'","''") + "%' order by game_name asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -41,7 +41,8 @@ def GetGameDataFromTerm(term):
             game_type = str(record[1])
             db_id = str(record[2])
             system = str(record[3])
-            rowdata = "<tr><td><a href='addgame?dbid=" + db_id + "'>Download</a></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td></tr>"
+            cover = str(record[4])
+            rowdata = "<tr align='center'><td><a href='addgame?dbid=" + db_id + "'>Download</a></td><td><img width='85' height='120'  src='" + cover + "' /></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td></tr>"
             data = data + rowdata
         except:
             continue
@@ -51,7 +52,7 @@ def GetGameDataFromTerm(term):
 def AddGameToDb(db_id,status):
     LogEvent("Adding game in 'Wanted' status")
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "select game_name,system,game_type from games where ID = '" + db_id + "'"
+    sql = "select game_name,system,game_type,cover from games where ID = '" + db_id + "'"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -59,8 +60,9 @@ def AddGameToDb(db_id,status):
     game_name = str(result[0])
     system = str(result[1])
     game_type = str(result[2])
+    cover = str(result[3])
     cursor.close()
-    sql = "insert into requested_games(GAME_NAME,SYSTEM,GAME_TYPE,status) values('" + game_name.replace("'","''") + "','" + system + "','" + game_type + "','" + status + "')"
+    sql = "insert into requested_games(GAME_NAME,SYSTEM,GAME_TYPE,status,cover) values('" + game_name.replace("'","''") + "','" + system + "','" + game_type + "','" + status + "','" + cover + "')"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -70,7 +72,7 @@ def AddGameToDb(db_id,status):
 
 def GetRequestedGames():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT id,game_name,game_type,status,system FROM requested_games order by game_name asc"
+    sql = "SELECT id,game_name,game_type,status,system,cover FROM requested_games order by game_name asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -83,7 +85,8 @@ def GetRequestedGames():
             game_type = str(record[2])
             status = str(record[3])
             system = str(record[4])
-            rowdata = "<tr><td><a href='removegame?dbid=" + db_id + "'>Delete</a></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td><td>" + status + "</td><td><select id=updateSatusSelectObject class=ui-widget onchange=UpdateGameStatus(this.options[this.selectedIndex].value,'" + db_id + "')>"
+	    cover = str(record[5])
+            rowdata = "<tr align='center'><td><a href='removegame?dbid=" + db_id + "'>Delete</a></td><td><center><img width='85' height='120'  src='" + cover + "' /></center></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td><td>" + status + "</td><td><select id=updateSatusSelectObject class=ui-widget onchange=UpdateGameStatus(this.options[this.selectedIndex].value,'" + db_id + "')>"
             if(status == "Snatched"):
                 rowdata = rowdata + "<option>Downloaded</option><option selected=true>Snatched</option><option>Wanted</option>"
             elif(status == "Downloaded"):
@@ -127,6 +130,8 @@ def UpdateStatus(game_id,status):
     cursor.execute(sql)
     connection.commit()
     cursor.close()
+
+    Notifications.HandleNotifications(game_id,status)
     return
 
 def ValidateDB():
@@ -176,7 +181,7 @@ def ValidateDB():
         cursor.execute(sql)
         connection.commit()
         cursor.close()
-        sql = "CREATE TABLE REQUESTED_GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT,STATUS TEXT)"
+        sql = "CREATE TABLE REQUESTED_GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT,STATUS TEXT,COVER TEXT)"
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute(sql)
@@ -200,7 +205,7 @@ def ValidateDB():
         cursor.execute(sql)
         connection.commit()
         cursor.close()
-        sql = "CREATE TABLE GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT)"
+        sql = "CREATE TABLE GAMES (ID INTEGER PRIMARY KEY,GAME_NAME TEXT,SYSTEM TEXT,GAME_TYPE TEXT,COVER TEXT)"
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute(sql)
@@ -208,7 +213,44 @@ def ValidateDB():
         cursor.close()
         AddWiiGamesIfMissing()
         print "Database upgrade complete"
-
+	
+    try:
+        sql = "alter table games add column cover text"
+	connection = sqlite3.connect(db_path)
+	cursor = connection.cursor()
+	cursor.execute(sql)
+	connection.commit()
+	cursor.close()
+    except:
+	status = "Do Nothing"
+	
+    try:
+        sql = "alter table requested_games add column cover text"
+	connection = sqlite3.connect(db_path)
+	cursor = connection.cursor()
+	cursor.execute(sql)
+	connection.commit()
+	cursor.close()
+    except:
+	status = "Do Nothing"	
+    
+    #loop requested games where cover is null
+    sql = "select game_name,cover,system from requested_games where cover is null"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    cursor.close()
+    for record in result:
+	game_name = str(record[0])
+	cover = str(record[1])
+	system = str(record[2])
+	sql = "update requested_games set cover = (Select cover from games where game_name = '" + game_name + "' and system = '" + system + "') Where game_name = '" + game_name + "' and system = '" + system + "'"
+        connection = sqlite3.connect(db_path)
+	cursor = connection.cursor()
+	cursor.execute(sql)
+	connection.commit()
+	cursor.close()
     return
 
 def AddEventToDB(message):
@@ -277,6 +319,7 @@ def AddWiiGamesIfMissing():
         for data in json_data:
             game_name = data['GameTitle']
             game_type = data['GameType'] 
+	    game_cover = data['GameCover']
             db_path = os.path.join(os.path.abspath(""),"Gamez.db")
             sql = "SELECT count(ID) from games where game_name = '" + game_name.replace("'","''") + "' AND system='Wii'"
             connection = sqlite3.connect(db_path)
@@ -287,7 +330,7 @@ def AddWiiGamesIfMissing():
             cursor.close()
             if(str(recordCount) == "0"):
                 LogEvent("Adding Wii Game [" + game_name.replace("'","''") + "] to Game List")
-                sql = "INSERT INTO games (game_name,game_type,system) values('" + game_name.replace("'","''") + "','" + game_type + "','Wii')"
+                sql = "INSERT INTO games (game_name,game_type,system,cover) values('" + game_name.replace("'","''") + "','" + game_type + "','Wii','" + game_cover + "')"
                 cursor = connection.cursor()
                 cursor.execute(sql)
                 connection.commit()
@@ -309,6 +352,7 @@ def AddXbox360GamesIfMissing():
     for data in json_data:
         game_name = data['GameTitle']
         game_type = data['GameType'] 
+        game_cover = data['GameCover']
         db_path = os.path.join(os.path.abspath(""),"Gamez.db")
         sql = "SELECT count(ID) from games where game_name = '" + game_name.replace("'","''") + "' AND system='Xbox360'"
         connection = sqlite3.connect(db_path)
@@ -319,7 +363,7 @@ def AddXbox360GamesIfMissing():
         cursor.close()
         if(str(recordCount) == "0"):
             LogEvent("Adding XBOX 360 Game [" + game_name.replace("'","''") + "] to Game List")
-            sql = "INSERT INTO games (game_name,game_type,system) values('" + game_name.replace("'","''") + "','" + game_type + "','Xbox360')"
+            sql = "INSERT INTO games (game_name,game_type,system,cover) values('" + game_name.replace("'","''") + "','" + game_type + "','Xbox360','" + game_cover + "')"
             cursor = connection.cursor()
             cursor.execute(sql)
             connection.commit()
@@ -338,7 +382,7 @@ def ApiGetGamesFromTerm(term,system):
         try:
             game_name = str(record[0])
             system = str(record[1])
-            rowdata = '{"GameTitle":"' + game_name + '","System":"' + system + '"},'
+            rowdata = '{"GameTitle":"' + game_name + '","System":"' + system + '","GameCover":"' + cover + '"},'
             data = data + rowdata
         except:
             continue

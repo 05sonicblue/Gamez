@@ -34,6 +34,10 @@ def CheckConfigForAllKeys(app_path):
         config.add_section('Newznab')
         changesMade = True
      
+    if(config.has_section('Notifications') == False):
+        config.add_section('Notifications')
+        changesMade = True
+     
     if(config.has_option('global','server.socket_host') == False):
         config.set('global','server.socket_host','"127.0.0.1"')
         changesMade = True
@@ -98,6 +102,10 @@ def CheckConfigForAllKeys(app_path):
     if(config.has_option('Newznab','port') == False):
         config.set('Newznab','port','')
         changesMade = True
+
+    if(config.has_option('Notifications','prowl_api') == False):
+	config.set('Notifications','prowl__api','""')
+	changesMade = True
 
     if(changesMade):
         with open(configFilePath,'wb') as configFile:
