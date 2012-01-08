@@ -104,7 +104,7 @@ def CheckConfigForAllKeys(app_path):
         changesMade = True
 
     if(config.has_option('Notifications','prowl_api') == False):
-	config.set('Notifications','prowl__api','""')
+	config.set('Notifications','prowl_api','""')
 	changesMade = True
 
     if(changesMade):
