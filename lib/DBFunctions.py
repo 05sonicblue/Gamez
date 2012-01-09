@@ -28,9 +28,9 @@ def GetGamesFromTerm(term):
     data = "[" + data + "]"
     return data
 
-def GetGameDataFromTerm(term):
+def GetGameDataFromTerm(term,system):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT game_name,game_type,id,system,cover FROM games where game_name like '%" + term.replace("'","''") + "%' order by game_name asc"
+    sql = "SELECT game_name,game_type,id,system,cover FROM games where game_name like '%" + term.replace("'","''") + "%' AND system like '%" + system + "%' order by game_name asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()

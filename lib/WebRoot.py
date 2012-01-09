@@ -73,6 +73,8 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
+                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
                             $("#search").autocomplete(
@@ -85,8 +87,12 @@ class WebRoot:
                             );
                             $("button").button().click(function(){
                                 var searchText = document.getElementById("search").value;
-                                //alert(searchText);
-                                document.location.href = "search?term=" + searchText;
+                                var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
+                                if(system == "---")
+                                {
+                                    system = "";	
+                                }
+                                document.location.href = "search?term=" + searchText + "&system=" + system;
                             });
                         </script>
                     </div>
@@ -131,7 +137,7 @@ class WebRoot:
         return html;
 
     @cherrypy.expose
-    def search(self,term=''):
+    def search(self,term='',system=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
         html = """
@@ -177,6 +183,8 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
+                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
                             $("#search").autocomplete(
@@ -189,8 +197,12 @@ class WebRoot:
                             );
                             $("button").button().click(function(){
                                 var searchText = document.getElementById("search").value;
-                                //alert(searchText);
-                                document.location.href = "search?term=" + searchText;
+                                var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
+				if(system == "---")
+				{
+				    system = "";	
+				}
+                                document.location.href = "search?term=" + searchText + "&system=" + system;
                             });
                         </script>
                     </div>
@@ -198,7 +210,7 @@ class WebRoot:
             </div>
             <div style="visibility:hidden"><a href="http://apycom.com/">jQuery Menu by Apycom</a></div>
             <div id="container">"""
-        db_result = GetGameDataFromTerm(term)
+        db_result = GetGameDataFromTerm(term,system)
         if(db_result == ''):
             html  = html + """No Results Found. Try Searching Again"""
         else:
@@ -282,6 +294,8 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
+                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
                             $("#search").autocomplete(
@@ -293,8 +307,12 @@ class WebRoot:
                                 }
                             );
                             $("button").button().click(function(){
-                                var searchText = document.getElementById("search").value;
-                                document.location.href = "search?term=" + searchText;
+                                var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
+				if(system == "---")
+				{
+				    system = "";	
+				}
+                                document.location.href = "search?term=" + searchText + "&system=" + system;
                             });
                         </script>
                     </div>
@@ -432,6 +450,8 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
+                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
                             $("#search").autocomplete(
@@ -443,8 +463,12 @@ class WebRoot:
                                 }
                             );
                             $("button").button().click(function(){
-                                var searchText = document.getElementById("search").value;
-                                document.location.href = "search?term=" + searchText;
+                                var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
+				if(system == "---")
+				{
+				    system = "";	
+				}
+                                document.location.href = "search?term=" + searchText + "&system=" + system;
                             });
                         </script>
                     </div>
