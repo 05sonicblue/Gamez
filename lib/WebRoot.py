@@ -311,6 +311,12 @@ class WebRoot:
                 <label>Gamez Port</label>
                 <input type="text" name="cherrypyPort" id="cherrypyPort" value='""" + config.get('global','server.socket_port').replace('"','') +  """' />
 
+                <label>Gamez Username</label>
+                <input type="text" name="gamezUsername" id="gamezUsername" value='""" + config.get('global','user_name').replace('"','') +  """' />
+
+                <label>Gamez Port</label>
+                <input type="text" name="gamezPassword" id="gamezPassword" value='""" + config.get('global','password').replace('"','') +  """' />
+
                 <label>Download Interval (In Seconds)</label>
                 <input type="text" name="downloadInterval" id="downloadInterval" value='""" + config.get('Scheduler','download_interval').replace('"','') +  """' />
 
@@ -482,7 +488,7 @@ class WebRoot:
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
         if(status <> ''):
-            UpdateStatus(game_id,status)
+            UpdateStatus(game_id,status,WebRoot.appPath)
         raise cherrypy.InternalRedirect('/')
 
     @cherrypy.expose
@@ -518,7 +524,7 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
@@ -530,11 +536,15 @@ class WebRoot:
         newznabWiiCat = '"' + newznabWiiCat + '"'
         newznabXbox360Cat = '"' + newznabXbox360Cat + '"'
 	prowlApi = '"' + prowlApi + '"'
+	gamezUsername = '"' + gamezUsername + '"'
+	gamezPassword = '"' + gamezPassword + '"'
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
         config.set('global','server.socket_host',cherrypyHost)
         config.set('global','server.socket_port',cherrypyPort)
+        config.set('global','user_name',gamezUsername)
+        config.set('global','password',gamezPassword)
         config.set('NZBMatrix','username',nzbMatrixUsername)
         config.set('NZBMatrix','api_key',nzbMatrixApi)
         config.set('Sabnzbd','host',sabHost)

@@ -15,6 +15,7 @@ from cherrypy.process.plugins import Daemonizer
 from lib.ConfigFunctions import CheckConfigForAllKeys
 from lib.DBFunctions import ValidateDB
 from lib.Logger import LogEvent
+import cherrypy.lib.auth_basic
 
 app_path = os.path.dirname(os.path.abspath("__FILE__"))
 config_path = os.path.join(app_path,'Gamez.ini')
@@ -30,13 +31,23 @@ class RunApp():
         js_path = os.path.join(app_path,'js')
         theme_path = os.path.join(css_path,'redmond')
         theme_images_path = os.path.join(theme_path,'images')
+        config = ConfigParser.RawConfigParser()
+	config.read('Gamez.ini')
+        username = config.get('global','user_name').replace('"','')
+        password = config.get('global','password').replace('"','')
+        useAuth = False
+        if(username <> "" or password <> ""):
+            useAuth = True          	
+        userPassDict = {username:password}  
+        checkpassword = cherrypy.lib.auth_basic.checkpassword_dict(userPassDict)
         conf = {
+        	'/':{'tools.auth_basic.on':useAuth,'tools.auth_basic.realm':'Gamez','tools.auth_basic.checkpassword':checkpassword},
                 '/css': {'tools.staticdir.on':True,'tools.staticdir.dir':css_path},
                 '/js':{'tools.staticdir.on':True,'tools.staticdir.dir':js_path},
                 '/css/redmond':{'tools.staticdir.on':True,'tools.staticdir.dir':theme_path},
                 '/css/redmond/images':{'tools.staticdir.on':True,'tools.staticdir.dir':theme_images_path},
                 '/css/navigation_images':{'tools.staticdir.on':True,'tools.staticdir.dir':navigation_images_path},
-                '/css/datatables_images':{'tools.staticdir.on':True,'tools.staticdir.dir':datatables_images_path}
+                '/css/datatables_images':{'tools.staticdir.on':True,'tools.staticdir.dir':datatables_images_path},
             }
         daemon = Daemonizer(cherrypy.engine)
         

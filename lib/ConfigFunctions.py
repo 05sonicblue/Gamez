@@ -46,6 +46,14 @@ def CheckConfigForAllKeys(app_path):
         config.set('global','server.socket_port','8085')
         changesMade = True
 
+    if(config.has_option('global','user_name') == False):
+        config.set('global','user_name','""')
+        changesMade = True
+        
+    if(config.has_option('global','password') == False):
+        config.set('global','password','""')
+        changesMade = True        
+
     if(config.has_option('NZBMatrix','username') == False):
         config.set('NZBMatrix','username','""')
         changesMade = True

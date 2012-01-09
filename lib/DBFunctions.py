@@ -5,6 +5,7 @@ import datetime
 from Logger import LogEvent
 import urllib
 import json
+import Notifications
 
 def GetGamesFromTerm(term):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
@@ -121,17 +122,29 @@ def GetRequestedGamesAsArray():
     cursor.close()
     return result
 
-def UpdateStatus(game_id,status):
+def UpdateStatus(game_id,status,appPath):
     LogEvent("Update status of game to " + status)
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "update requested_games set status='" + status + "' where ID='" + game_id + "'"
+    game_name = ""
+    system = ""
+    sql = "select game_name,system from requested_games where ID='" + game_id + "'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    tables = list()
+    for record in result:
+        game_name = str(record[0])
+        system = str(record[1])
+    cursor.close()    
+    sql = "update requested_games set status='" + status + "' where game_name = '" + game_name + "' and system = '" + system + "'"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
     connection.commit()
     cursor.close()
-
-    Notifications.HandleNotifications(game_id,status)
+    message = "Gamez Notification: " + system + " Game: " + game_name + " has been " + status
+    Notifications.HandleNotifications(status,message,appPath)
     return
 
 def ValidateDB():
