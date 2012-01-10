@@ -13,7 +13,7 @@ import ConfigParser
 import cherrypy.process.plugins
 from cherrypy.process.plugins import Daemonizer
 from lib.ConfigFunctions import CheckConfigForAllKeys
-from lib.DBFunctions import ValidateDB
+from lib.DBFunctions import ValidateDB,AddWiiGamesIfMissing,AddXbox360GamesIfMissing
 from lib.Logger import LogEvent
 import cherrypy.lib.auth_basic
 
@@ -63,16 +63,21 @@ class RunApp():
         config = ConfigParser.RawConfigParser()
         config.read('Gamez.ini')
         interval = config.get('Scheduler','download_interval').replace('"','')
+        updateGameListInterval = config.get('Scheduler','game_list_update_interval').replace('"','')
         fInterval = float(interval)
+        fUpdateGameListInterval = float(updateGameListInterval)
         workerTask = cherrypy.process.plugins.BackgroundTask(fInterval,RunGameTask)
+        gameListUpdaterWorkTask = cherrypy.process.plugins.BackgroundTask(fUpdateGameListInterval,RunGameListUpdaterTask)
         try:
-            workerTask.start()            
+            workerTask.start()
+            gameListUpdaterWorkTask.start()
 
             LogEvent("Starting the Gamez web server")
             cherrypy.quickstart(WebRoot(app_path),'/',config=conf)
         except KeyboardInterrupt:
             LogEvent("Shutting down Gamez")
             workerTask.cancel()
+            gameListUpdaterWorkTask.cancel()
             if(isToDaemonize == 1):    
                 daemon.unsubscribe()
         
@@ -132,6 +137,19 @@ def RunGameTask():
         lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat)
     except:
         errorMessage = "Major error occured when running scheduled tasks"
+        for message in sys.exc_info():
+            errorMessage = errorMessage + " - " + str(message)
+        LogEvent(errorMessage)
+
+def RunGameListUpdaterTask():
+    try:
+        LogEvent("Updating Game Lists")
+        AddWiiGamesIfMissing()
+        LogEvent("Wii Game List Updated")
+        AddXbox360GamesIfMissing()
+        LogEvent("XBOX 360 Game List Updated")
+    except:
+        errorMessage = "Major error occured when running Update Game List scheduled tasks"
         for message in sys.exc_info():
             errorMessage = errorMessage + " - " + str(message)
         LogEvent(errorMessage)

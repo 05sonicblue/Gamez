@@ -77,6 +77,10 @@ def CheckConfigForAllKeys(app_path):
     if(config.has_option('Scheduler','download_interval') == False):
         config.set('Scheduler','download_interval','60')
         changesMade = True
+        
+    if(config.has_option('Scheduler','game_list_update_interval') == False):
+        config.set('Scheduler','game_list_update_interval','86400')
+        changesMade = True
 
     if(config.has_option('SystemGenerated','is_to_ignore_update') == False):
         config.set('SystemGenerated','is_to_ignore_update','0')

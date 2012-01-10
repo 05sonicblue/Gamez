@@ -338,6 +338,9 @@ class WebRoot:
                 <label>Download Interval (In Seconds)</label>
                 <input type="text" name="downloadInterval" id="downloadInterval" value='""" + config.get('Scheduler','download_interval').replace('"','') +  """' />
 
+                <label>Game List Update Interval (In Seconds)</label>
+                <input type="text" name="gameListUpdateInterval" id="gameListUpdateInterval" value='""" + config.get('Scheduler','game_list_update_interval').replace('"','') +  """' />
+
                 <label>Gamez API Key</label>
                 <input type="text" name="gamezApiKey" id="gamezApiKey" value='""" + config.get('SystemGenerated','api_key').replace('"','') +  """' />
 
@@ -548,7 +551,7 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
@@ -575,6 +578,7 @@ class WebRoot:
         config.set('Sabnzbd','port',sabPort)
         config.set('Sabnzbd','api_key',sabApi)
         config.set('Scheduler','download_interval',downloadInterval)
+        config.set('Scheduler','game_list_update_interval',gameListUpdateInterval)
         config.set('SystemGenerated','api_key',gamezApiKey)
         config.set('Newznab','host',newznabHost)
         config.set('Newznab','port',newznabPort)
