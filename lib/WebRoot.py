@@ -1,7 +1,7 @@
 import cherrypy
 import json
 import os
-from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,ApiGetGamesFromTerm
+from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,ApiGetGamesFromTerm,AddComingSoonGames,GetUpcomingGames
 from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVersion
 import ConfigParser
 from time import sleep
@@ -66,6 +66,11 @@ class WebRoot:
                     <li class="parent">
                         <a href="/updategamelist">
                             Update Game List
+                        </a>
+                    </li>
+                    <li class="parent">
+                        <a href="/comingsoon">
+                            Upcoming Releases
                         </a>
                     </li>
                 </ul>
@@ -178,6 +183,11 @@ class WebRoot:
                             Update Game List
                         </a>
                     </li>
+                    <li class="parent">
+                        <a href="/comingsoon">
+                            Upcoming Releases
+                        </a>
+                    </li>                    
                 </ul>
                <div style="text-align:right;margin-right:20px">
                     <div class=ui-widget>
@@ -289,6 +299,11 @@ class WebRoot:
                             Update Game List
                         </a>
                     </li>
+                    <li class="parent">
+                        <a href="/comingsoon">
+                            Upcoming Releases
+                        </a>
+                    </li>                    
                 </ul>
                 <div style="text-align:right;margin-right:20px">
                     <div class=ui-widget>
@@ -332,7 +347,7 @@ class WebRoot:
                 <label>Gamez Username</label>
                 <input type="text" name="gamezUsername" id="gamezUsername" value='""" + config.get('global','user_name').replace('"','') +  """' />
 
-                <label>Gamez Port</label>
+                <label>Gamez Password</label>
                 <input type="text" name="gamezPassword" id="gamezPassword" value='""" + config.get('global','password').replace('"','') +  """' />
 
                 <label>Download Interval (In Seconds)</label>
@@ -355,6 +370,8 @@ class WebRoot:
                 <label>SABnzbd+ API Key</label>
                 <input type="text" name="sabApi" id="sabApi" value='""" + config.get('Sabnzbd','api_key').replace('"','') +  """' />
                 
+                <label>SABnzbd+ Download Category</label>
+                <input type="text" name="sabCategory" id="sabCategory" value='""" + config.get('Sabnzbd','category').replace('"','') +  """' />
 
                 <h1>NZB Matrix</h1>
 
@@ -448,6 +465,11 @@ class WebRoot:
                             Update Game List
                         </a>
                     </li>
+                    <li class="parent">
+                        <a href="/comingsoon">
+                            Upcoming Releases
+                        </a>
+                    </li>                    
                 </ul>
                 <div style="text-align:right;margin-right:20px">
                     <div class=ui-widget>
@@ -511,11 +533,120 @@ class WebRoot:
         return html;
 
     @cherrypy.expose
+    def comingsoon(self):
+        if(os.name <> 'nt'):
+            os.chdir(WebRoot.appPath)
+        html = """
+
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+        <html>
+          <head>
+            <title>Gamez :: Upcoming Releases</title>
+            <link rel="stylesheet" type="text/css" href="css/navigation.css" />
+            <link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css" />
+            <link rel="stylesheet" type="text/css" href="css/datatables.css" />
+            <link rel="stylesheet" type="text/css" href="css/jquery.ui.override.css" />
+            <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+            <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+            <script type="text/javascript" src="js/menu.js"></script>
+            <script type="text/javascript" language="javascript" src="/js/jquery.dataTables.min.js"></script>
+          </head>
+          <body id="dt_example">"""
+        html = html + """
+            <div id="menu">
+                <ul class="menu">
+                    <li class="parent">
+                        <a href="/">
+                            Home
+                        </a>
+                    </li>
+                    <li class="parent">
+                        <a href="/settings">
+                            Settings
+                        </a>
+                    </li>
+                    <li class="parent">
+                        <a href="/log">
+                            Log
+                        </a>
+                    </li>
+                    <li class="parent">
+                        <a href="/updategamelist">
+                            Update Game List
+                        </a>
+                    </li>
+                    <li class="parent">
+                        <a href="/comingsoon">
+                            Upcoming Releases
+                        </a>
+                    </li>                    
+                </ul>
+                <div style="text-align:right;margin-right:20px">
+                    <div class=ui-widget>
+                        <INPUT id=search />
+                        &nbsp;
+                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        &nbsp;
+                        <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
+                        <script>
+                            $("#search").autocomplete(
+                                {
+                                    source:"/get_game_list/",
+                                    minChars: 1,
+                                    max:25,
+                                    dataType:'json'
+                                }
+                            );
+                            $("button").button().click(function(){
+                                var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
+				if(system == "---")
+				{
+				    system = "";	
+				}
+                                document.location.href = "search?term=" + searchText + "&system=" + system;
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <div style="visibility:hidden"><a href="http://apycom.com/">jQuery Menu by Apycom</a></div>
+            <div id="container">"""
+        db_result = GetUpcomingGames()
+        if(db_result == ''):
+            html  = html + """No Upcoming Games."""
+        else:
+            html = html + """
+              <table cellpadding="0" cellspacing="0" border="0" class="display" id="searchresults">
+                <thead>
+                    <th>Game Name</th>
+                    <th>Release Date</th>
+                    <th>System</th>
+                  </tr>
+                </thead>
+                <tbody>"""
+            html = html + db_result
+            html = html + """
+                </tbody>
+              </table>
+              <script>$(document).ready(function() {
+	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false});});
+              </script>
+             """
+        html = html + """
+            </div>
+          </body>
+        </html>
+        
+
+               """
+        return html;
+
+    @cherrypy.expose
     def updatestatus(self,game_id='',status=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
         if(status <> ''):
-            UpdateStatus(game_id,status,WebRoot.appPath)
+            UpdateStatus(game_id,status)
         raise cherrypy.InternalRedirect('/')
 
     @cherrypy.expose
@@ -551,12 +682,13 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval='',sabCategory=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
         sabApi = '"' + sabApi + '"'
         sabHost = '"' + sabHost + '"'
+        sabCategory = '"' + sabCategory + '"'
         gamezApiKey = '"' + gamezApiKey + '"'
         newznabHost = '"' + newznabHost + '"'
         newznabApi = '"' + newznabApi + '"'
@@ -577,6 +709,7 @@ class WebRoot:
         config.set('Sabnzbd','host',sabHost)
         config.set('Sabnzbd','port',sabPort)
         config.set('Sabnzbd','api_key',sabApi)
+        config.set('Sabnzbd','category',sabCategory)
         config.set('Scheduler','download_interval',downloadInterval)
         config.set('Scheduler','game_list_update_interval',gameListUpdateInterval)
         config.set('SystemGenerated','api_key',gamezApiKey)
@@ -627,5 +760,6 @@ class WebRoot:
     def updategamelist(self):
         AddWiiGamesIfMissing()
         AddXbox360GamesIfMissing()
+        AddComingSoonGames()
         status = "Game list has been updated successfully"
         raise cherrypy.InternalRedirect("/?status_message=" + status)

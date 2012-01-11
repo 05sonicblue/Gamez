@@ -122,7 +122,7 @@ def GetRequestedGamesAsArray():
     cursor.close()
     return result
 
-def UpdateStatus(game_id,status,appPath):
+def UpdateStatus(game_id,status):
     LogEvent("Update status of game to " + status)
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     game_name = ""
@@ -144,6 +144,7 @@ def UpdateStatus(game_id,status,appPath):
     connection.commit()
     cursor.close()
     message = "Gamez Notification: " + system + " Game: " + game_name + " has been " + status
+    appPath = os.path.abspath("")
     Notifications.HandleNotifications(status,message,appPath)
     return
 
@@ -152,6 +153,7 @@ def ValidateDB():
     sql = "select name from sqlite_master where type='table'"
     logTableExists = False
     oldWiiGamesTableExists = False
+    comingSoonTableExists = False
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -163,6 +165,8 @@ def ValidateDB():
             logTableExists = True
         elif(tableName == 'wii_games'):
             oldWiiGamesTableExists = True
+        elif(tableName == 'comingsoon'):
+            comingSoonTableExists = True
     cursor.close()
     if(logTableExists == False):
         sql = "create table gamez_log(ID INTEGER NOT NULL PRIMARY KEY UNIQUE,message TEXT(255) NOT NULL,created_date DATE)"
@@ -264,8 +268,16 @@ def ValidateDB():
 	cursor.execute(sql)
 	connection.commit()
 	cursor.close()
-    return
-
+		
+    if(comingSoonTableExists == False):
+	sql = "create table comingsoon(ID INTEGER NOT NULL PRIMARY KEY UNIQUE,GameTitle TEXT(255),ReleaseDate DATE,System TEXT(255))"
+	connection = sqlite3.connect(db_path)
+	cursor = connection.cursor()
+	cursor.execute(sql)
+	connection.commit()
+        cursor.close()
+        AddComingSoonGames()  
+    	
 def AddEventToDB(message):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     createdDate = datetime.datetime.now()
@@ -383,6 +395,69 @@ def AddXbox360GamesIfMissing():
             cursor.close()       
     return
 
+def ClearComingSoonGames():
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "delete from comingsoon"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    connection.commit()
+    cursor.close()
+    return
+    
+def AddComingSoonGames():
+        comingSoonWebServiceUrl = "http://www.gamezapp.org/webservice/comingsoon"
+        response = ''
+        try:
+            responseObject = urllib.FancyURLopener({}).open(comingSoonWebServiceUrl)
+            response = responseObject.read()
+            responseObject.close()
+        except:
+            LogEvent("Unable to connect to web service: " + comingSoonWebServiceUrl)
+            return
+        json_data = json.loads(response)
+        ClearComingSoonGames()
+        for data in json_data:
+            game_name = data['GameTitle']
+            release_date = data['ReleaseDate'] 
+	    system = data['System']
+            db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+            sql = "SELECT count(ID) from comingsoon where gametitle = '" + game_name.replace("'","''") + "' AND system='" + system + "'"
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            result = cursor.fetchall()    
+            recordCount = result[0][0] 
+            cursor.close()
+            if(str(recordCount) == "0"):
+                LogEvent("Adding " + system + " Game [" + game_name.replace("'","''") + "] to Coming Soon Game List")
+                sql = "INSERT INTO comingsoon (gametitle,releasedate,system) values('" + game_name.replace("'","''") + "','" + release_date + "','" + system + "')"
+                cursor = connection.cursor()
+                cursor.execute(sql)
+                connection.commit()
+                cursor.close()       
+        return    
+        
+def GetUpcomingGames():
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "SELECT gametitle,strftime('%m/%d/%Y',releasedate),system FROM comingsoon order by releasedate asc"
+    data = ''
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    for record in result:
+        try:
+            gametitle = str(record[0])
+            releasedate = str(record[1])
+            system = str(record[2])
+            rowdata = "<tr><td>" + gametitle + "</td><td>" + releasedate + "</td><td>" + system + "</td></tr>"
+            data = data + rowdata
+        except:
+            continue
+    cursor.close()
+    return data
+
 def ApiGetGamesFromTerm(term,system):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     sql = "SELECT GAME_NAME,SYSTEM FROM GAMES where game_name like '%" + term.replace("'","''") + "%' AND SYSTEM LIKE '%" + system + "%' ORDER BY GAME_NAME ASC"
@@ -403,3 +478,5 @@ def ApiGetGamesFromTerm(term,system):
     data = data[:-1]
     data = "[" + data + "]"
     return data
+    
+   

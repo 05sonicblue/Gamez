@@ -7,13 +7,14 @@ import sys
 import sched
 import time
 import threading
+import thread
 import datetime
 import lib.GameTasks
 import ConfigParser
 import cherrypy.process.plugins
 from cherrypy.process.plugins import Daemonizer
 from lib.ConfigFunctions import CheckConfigForAllKeys
-from lib.DBFunctions import ValidateDB,AddWiiGamesIfMissing,AddXbox360GamesIfMissing
+from lib.DBFunctions import ValidateDB,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,AddComingSoonGames
 from lib.Logger import LogEvent
 import cherrypy.lib.auth_basic
 
@@ -21,6 +22,8 @@ app_path = os.path.dirname(os.path.abspath("__FILE__"))
 config_path = os.path.join(app_path,'Gamez.ini')
 
 class RunApp():
+
+
     def RunWebServer(self,isToDaemonize):
         LogEvent("Generating CherryPy configuration")
         cherrypy.config.update(config_path)
@@ -49,10 +52,10 @@ class RunApp():
                 '/css/navigation_images':{'tools.staticdir.on':True,'tools.staticdir.dir':navigation_images_path},
                 '/css/datatables_images':{'tools.staticdir.on':True,'tools.staticdir.dir':datatables_images_path},
             }
-        daemon = Daemonizer(cherrypy.engine)
         
         if(isToDaemonize == 1):
-            LogEvent("Preparing to run in daemon mode")    
+            LogEvent("Preparing to run in daemon mode")  
+            daemon = Daemonizer(cherrypy.engine)
             daemon.subscribe()        
         
         LogEvent("Generating Post Process Script")
@@ -66,20 +69,23 @@ class RunApp():
         updateGameListInterval = config.get('Scheduler','game_list_update_interval').replace('"','')
         fInterval = float(interval)
         fUpdateGameListInterval = float(updateGameListInterval)
-        workerTask = cherrypy.process.plugins.BackgroundTask(fInterval,RunGameTask)
-        gameListUpdaterWorkTask = cherrypy.process.plugins.BackgroundTask(fUpdateGameListInterval,RunGameListUpdaterTask)
+	#thread.start_new_thread(ScheduleGameTasks,(fInterval,))
+        #workerTask = cherrypy.process.plugins.BackgroundTask(fInterval,RunGameTask)
+        #gameListUpdaterWorkTask = cherrypy.process.plugins.BackgroundTask(fUpdateGameListInterval,RunGameListUpdaterTask)
         try:
-            workerTask.start()
-            gameListUpdaterWorkTask.start()
-
+            LogEvent("Setting up download scheduler")
+            gameTasksScheduler = cherrypy.process.plugins.Monitor(cherrypy.engine,RunGameTask,fInterval)
+	    gameTasksScheduler.subscribe()
+	    LogEvent("Setting up game list update scheduler")
+	    gameListUpdaterScheduler = cherrypy.process.plugins.Monitor(cherrypy.engine,RunGameListUpdaterTask,fUpdateGameListInterval)
+	    gameListUpdaterScheduler.subscribe()
             LogEvent("Starting the Gamez web server")
             cherrypy.quickstart(WebRoot(app_path),'/',config=conf)
         except KeyboardInterrupt:
             LogEvent("Shutting down Gamez")
-            workerTask.cancel()
-            gameListUpdaterWorkTask.cancel()
             if(isToDaemonize == 1):    
                 daemon.unsubscribe()
+            sys.exit()
         
 def GenerateSabPostProcessScript():
     config = ConfigParser.RawConfigParser()
@@ -128,13 +134,14 @@ def RunGameTask():
         sabnzbdHost = config.get('Sabnzbd','host').replace('"','')
         sabnzbdPort = config.get('Sabnzbd','port').replace('"','')
         sabnzbdApi = config.get('Sabnzbd','api_key').replace('"','')
+        sabnzbdCategory = config.get('Sabnzbd','category').replace('"','')
         newznabWiiCat = config.get('Newznab','wii_category_id').replace('"','')
         newznabXbox360Cat = config.get('Newznab','xbox360_category_id').replace('"','')
         newznabApi = config.get('Newznab','api_key').replace('"','')
         newznabHost = config.get('Newznab','host').replace('"','')
         newznabPort = config.get('Newznab','port').replace('"','')
         LogEvent("Searching for games")
-        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat)
+        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory)
     except:
         errorMessage = "Major error occured when running scheduled tasks"
         for message in sys.exc_info():
@@ -148,6 +155,8 @@ def RunGameListUpdaterTask():
         LogEvent("Wii Game List Updated")
         AddXbox360GamesIfMissing()
         LogEvent("XBOX 360 Game List Updated")
+        AddComingSoonGames
+        LogEvent("Coming Soon Game List Updated")
     except:
         errorMessage = "Major error occured when running Update Game List scheduled tasks"
         for message in sys.exc_info():

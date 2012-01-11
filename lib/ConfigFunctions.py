@@ -74,6 +74,10 @@ def CheckConfigForAllKeys(app_path):
         config.set('Sabnzbd','port','')
         changesMade = True
 
+    if(config.has_option('Sabnzbd','category') == False):
+        config.set('Sabnzbd','category','')
+        changesMade = True
+
     if(config.has_option('Scheduler','download_interval') == False):
         config.set('Scheduler','download_interval','60')
         changesMade = True
