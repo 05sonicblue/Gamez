@@ -22,6 +22,10 @@ def CheckConfigForAllKeys(app_path):
         config.add_section('Sabnzbd')
         changesMade = True
 
+    if(config.has_section('Blackhole') == False):
+        config.add_section('Blackhole')
+        changesMade = True
+
     if(config.has_section('Scheduler') == False):
         config.add_section('Scheduler')
         changesMade = True
@@ -94,6 +98,34 @@ def CheckConfigForAllKeys(app_path):
         config.set('SystemGenerated','ignored_version','""')
         changesMade = True
 
+    if(config.has_option('SystemGenerated','sabnzbd_enabled') == False):
+        config.set('SystemGenerated','sabnzbd_enabled','0')
+        changesMade = True
+        
+    if(config.has_option('SystemGenerated','nzbmatrix_enabled') == False):
+        config.set('SystemGenerated','nzbmatrix_enabled','0')
+        changesMade = True
+        
+    if(config.has_option('SystemGenerated','newznab_enabled') == False):
+        config.set('SystemGenerated','newznab_enabled','0')
+        changesMade = True        
+
+    if(config.has_option('SystemGenerated','prowl_enabled') == False):
+        config.set('SystemGenerated','prowl_enabled','0')
+        changesMade = True   
+        
+    if(config.has_option('SystemGenerated','growl_enabled') == False):
+        config.set('SystemGenerated','growl_enabled','0')
+        changesMade = True   
+        
+    if(config.has_option('SystemGenerated','notifo_enabled') == False):
+        config.set('SystemGenerated','notifo_enabled','0')
+        changesMade = True   
+        
+    if(config.has_option('SystemGenerated','blackhole_nzb_enabled') == False):
+        config.set('SystemGenerated','blackhole_nzb_enabled','0')
+        changesMade = True  
+        
     if(config.has_option('SystemGenerated','api_key') == False):
         apiKey = base64.b64encode(hashlib.sha256( str(random.getrandbits(256)) ).digest(), random.choice(['rA','aZ','gQ','hH','hG','aR','DD'])).rstrip('==')
         config.set('SystemGenerated','api_key','"' + apiKey + '"')
@@ -123,6 +155,30 @@ def CheckConfigForAllKeys(app_path):
 	config.set('Notifications','prowl_api','""')
 	changesMade = True
 
+    if(config.has_option('Notifications','growl_host') == False):
+	config.set('Notifications','growl_host','""')
+	changesMade = True
+
+    if(config.has_option('Notifications','growl_port') == False):
+	config.set('Notifications','growl_port','23053')
+	changesMade = True
+	
+    if(config.has_option('Notifications','growl_password') == False):
+	config.set('Notifications','growl_password','""')
+	changesMade = True	
+	
+    if(config.has_option('Notifications','notifo_username') == False):
+	config.set('Notifications','notifo_username','""')
+	changesMade = True	
+	
+    if(config.has_option('Notifications','notifo_apikey') == False):
+	config.set('Notifications','notifo_apikey','""')
+	changesMade = True
+	
+    if(config.has_option('Blackhole','nzb_blackhole_path') == False):
+	config.set('Blackhole','nzb_blackhole_path','""')
+	changesMade = True	
+	
     if(changesMade):
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)

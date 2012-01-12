@@ -260,6 +260,43 @@ class WebRoot:
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
+        #checkboxSettings
+        sabChecked = config.get('SystemGenerated','sabnzbd_enabled').replace('"','')
+        nzbmatrixChecked = config.get('SystemGenerated','nzbmatrix_enabled').replace('"','')
+        newznabChecked = config.get('SystemGenerated','newznab_enabled').replace('"','')
+        growlChecked = config.get('SystemGenerated','growl_enabled').replace('"','')
+        prowlChecked = config.get('SystemGenerated','prowl_enabled').replace('"','')
+        notifoChecked = config.get('SystemGenerated','notifo_enabled').replace('"','')
+        nzbBlackholeChecked = config.get('SystemGenerated','blackhole_nzb_enabled').replace('"','')
+        if(sabChecked == "1"):
+            sabChecked = "CHECKED"
+        else:
+            sabChecked = ""
+        if(nzbmatrixChecked == "1"):
+            nzbmatrixChecked = "CHECKED"
+        else:
+            nzbmatrixChecked = ""
+        if(newznabChecked == "1"):
+            newznabChecked = "CHECKED"
+        else:
+            newznabChecked = ""       
+        if(growlChecked == "1"):
+            growlChecked = "CHECKED"
+        else:
+            growlChecked = ""       
+        if(prowlChecked == "1"):
+            prowlChecked = "CHECKED"
+        else:
+            prowlChecked = ""       
+        if(notifoChecked == "1"):
+            notifoChecked = "CHECKED"
+        else:
+            notifoChecked = ""    
+        if(nzbBlackholeChecked == "1"):
+            nzbBlackholeChecked = "CHECKED"
+        else:
+            nzbBlackholeChecked = ""             
+             
         html = """
 
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -334,84 +371,295 @@ class WebRoot:
                 </div>
             </div>
             <div style="visibility:hidden"><a href="http://apycom.com/">jQuery Menu by Apycom</a></div>
-            <div id="stylized" class="myform">
-                <form id="form" name="form" method="get" action="/savesettings">
-                <h1>General</h1>
+            <div id="tabs">
+		<ul>
+			<li><a href="#gamez-tab">Gamez</a></li>
+			<li><a href="#downloaders-tab">Downloaders</a></li>
+			<li><a href="#searchproviders-tab">Search Providers+</a></li>
+			<li><a href="#notifications-tab">Notifications</a></li>
+		</ul>
+		<form id="form" name="form" method="get" action="/savesettings">
+		<div id="gamez-tab">
+			<p>
+				<table cellpadding="5">
+					<tr>
+						<td>
+							<label><b>Gamez Host</b></label>
+							<br />
+							<input style="width:250px" type="text" name="cherrypyHost" id="cherrypyHost" value='""" + config.get('global','server.socket_host').replace('"','') +  """' />
 
-                <label>Gamez Host</label>
-                <input type="text" name="cherrypyHost" id="cherrypyHost" value='""" + config.get('global','server.socket_host').replace('"','') +  """' />
+						</td>
+						
+						<td>
+							<label><b>Gamez Port</b></label>
+							<br />
+                					<input style="width:250px" type="text" name="cherrypyPort" id="cherrypyPort" value='""" + config.get('global','server.socket_port').replace('"','') +  """' />
+						</td>
+						<td>
+							<label><b>Gamez Username</b></label>
+							<br />
+							<input style="width:250px" type="text" name="gamezUsername" id="gamezUsername" value='""" + config.get('global','user_name').replace('"','') +  """' />
+						</td>
 
-                <label>Gamez Port</label>
-                <input type="text" name="cherrypyPort" id="cherrypyPort" value='""" + config.get('global','server.socket_port').replace('"','') +  """' />
+						<td>
+							<label><b>Gamez Password</b></label>
+							<br />
+							<input style="width:250px" type="text" name="gamezPassword" id="gamezPassword" value='""" + config.get('global','password').replace('"','') +  """' />
+						</td>
+					</tr>
+					<tr><td colspan="4"></td></tr>
+					<tr>
+						<td>
+							<label><b>Download Interval</b></label>
+							<br />
+							<label><b>(In Seconds)</b></label>
+							<br />
+                					<input style="width:250px" type="text" name="downloadInterval" id="downloadInterval" value='""" + config.get('Scheduler','download_interval').replace('"','') +  """' />
+						</td>
+						<td>
+							<label><b>Game List Update Interval</b></label>
+							<br />
+							<label><b>(In Seconds)</b></label>
+							<br />
+							<input style="width:250px" type="text" name="gameListUpdateInterval" id="gameListUpdateInterval" value='""" + config.get('Scheduler','game_list_update_interval').replace('"','') +  """' />
+						</td>
+						<td colspan="2">
+							<br />
+							<label><b>Gamez API Key</b></label>
+							<br />
+							<input style="width:520px" type="text" name="gamezApiKey" id="gamezApiKey" value='""" + config.get('SystemGenerated','api_key').replace('"','') +  """' />
 
-                <label>Gamez Username</label>
-                <input type="text" name="gamezUsername" id="gamezUsername" value='""" + config.get('global','user_name').replace('"','') +  """' />
-
-                <label>Gamez Password</label>
-                <input type="text" name="gamezPassword" id="gamezPassword" value='""" + config.get('global','password').replace('"','') +  """' />
-
-                <label>Download Interval (In Seconds)</label>
-                <input type="text" name="downloadInterval" id="downloadInterval" value='""" + config.get('Scheduler','download_interval').replace('"','') +  """' />
-
-                <label>Game List Update Interval (In Seconds)</label>
-                <input type="text" name="gameListUpdateInterval" id="gameListUpdateInterval" value='""" + config.get('Scheduler','game_list_update_interval').replace('"','') +  """' />
-
-                <label>Gamez API Key</label>
-                <input type="text" name="gamezApiKey" id="gamezApiKey" value='""" + config.get('SystemGenerated','api_key').replace('"','') +  """' />
-
-                <h1>SABnzbd+</h1>
-
-                <label>SABnzbd+ Host</label>
-                <input type="text" name="sabHost" id="sabHost" value='""" + config.get('Sabnzbd','host').replace('"','') +  """' />
-
-                <label>SABnzbd+ Port</label>
-                <input type="text" name="sabPort" id="sabPort" value='""" + config.get('Sabnzbd','port').replace('"','') +  """' />
-
-                <label>SABnzbd+ API Key</label>
-                <input type="text" name="sabApi" id="sabApi" value='""" + config.get('Sabnzbd','api_key').replace('"','') +  """' />
+						</td>
+					</tr>
+				</table>
+			</p>
+			
+		</div>
+		<div id="downloaders-tab">
+			<p>
+				<table cellpadding="5" width="100%">
+					<tr width="100%">
+						<td  style="border:solid 1px" width="45%" valign="top">
+							<label style="float:left"><b><u>Sabnzbd+</u></b></label>
+							<div style="float:right">
+							<input type="checkbox" name="sabnzbdEnabled" id="sabnzbdEnabled" value="sabnzbdEnabled" """ + sabChecked + """ />Enabled
+							</div>
+							<br />
+							<table>
+								<tr>
+									<td>
+										<label><b>SABnzbd+ Host</b></label>
+										<br />
+										<input style="width:200px" type="text" name="sabHost" id="sabHost" value='""" + config.get('Sabnzbd','host').replace('"','') +  """' />
+									</td>
+									<td>
+										<label><b>SABnzbd+ Port</b></label>
+										<br />
+										<input style="width:200px" type="text" name="sabPort" id="sabPort" value='""" + config.get('Sabnzbd','port').replace('"','') +  """' />
+									</td>
+									<td>
+										<label><b>SABnzbd+ Download Category</b></label>
+										<br />
+										<input style="width:225px" type="text" name="sabCategory" id="sabCategory" value='""" + config.get('Sabnzbd','category').replace('"','') +  """' />
+									</td>
+								</tr>
+								<tr><td>&nbsp;</td></tr>
+								<tr>
+									<td colspan="3">
+										<label><b>SABnzbd+ API Key</b></label>
+										<br />
+										<input style="width:400px" type="text" name="sabApi" id="sabApi" value='""" + config.get('Sabnzbd','api_key').replace('"','') +  """' />
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td width="10px">&nbsp;</td>
+						<td style="border:solid 1px" valign="top">
+							<legend><b><u>Blackhole</u></b></legend>
+							<br />
+							<label style="float:left"><b><u>NZB's</u></b></label>
+							<div style="float:right">
+								<input type="checkbox" name="nzbBlackholeEnabled" id="nzbBlackholeEnabled" value="nzbBlackholeEnabled" """ + nzbBlackholeChecked + """ />Enabled
+							</div>
+							<br />
+							<table>
+								<tr>
+									<td>
+										<label><b>NZB Blackhole Path</b></label>
+										<br />
+										<input style="width:400px" type="text" name="nzbBlackholePath" id="nzbBlackholePath" value='""" + config.get('Blackhole','nzb_blackhole_path').replace('"','') +  """' />
+									</td>
+								</tr>							
+							</table>	
+						</td>						
+					</tr>
+				</table>
+			</p>
+		</div>
+		<div id="searchproviders-tab">
+			<p>
+				<table cellpadding="5" width="100%">
+					<tr width="100%">
+						<td  style="border:solid 1px" width="45%" valign="top">
+							<label style="float:left"><b><u>NZB Matrix</u></b></label>
+								<div style="float:right">
+									<input type="checkbox" name="nzbmatrixEnabled" id="nzbmatrixEnabled" value="nzbmatrixEnabled" """ + nzbmatrixChecked + """ />Enabled
+								</div>
+							<br />
+							<table>
+								<tr>
+									<td>
+										<label><b>NZB Matrix API Key</b></label>
+										<br />
+										<input style="width:400px" type="text" name="nzbMatrixApi" id="nzbMatrixApi" value='""" + config.get('NZBMatrix','api_key').replace('"','') +  """' />
+									</td>
+								</tr>
+								<tr><td>&nbsp;</td></tr>
+								<tr>
+									<td>
+										<label><b>NZB Matrix Username</b></label>
+										<br />
+										<input style="width:225px" type="text" name="nzbMatrixUsername" id="nzbMatrixUsername" value='""" + config.get('NZBMatrix','username').replace('"','') +  """' />
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td width="10px">&nbsp;</td>
+						<td style="border:solid 1px" valign="top">
+							<label style="float:left"><b><u>Newznab</u></b></label>
+								<div style="float:right">
+									<input type="checkbox" name="newznabEnabled" id="newznabEnabled" value="newznabEnabled" """ + newznabChecked + """ />Enabled
+								</div>
+							<br />
+							<table>
+								<tr>
+									<td>
+										<label><b>Newznab Host</b></label>
+										<br />
+										<input style="width:225px" type="text" name="newznabHost" id="newznabHost" value='""" + config.get('Newznab','host').replace('"','') +  """' />
+									</td>
+									<td>
+										<label><b>Newznab Port</b></label>
+										<br />
+										<input style="width:225px" type="text" name="newznabPort" id="newznabPort" value='""" + config.get('Newznab','port').replace('"','') +  """' />
+									</td>
+								</tr>
+								<tr><td>&nbsp;</td></tr>
+								<tr>
+									<td>
+										<label><b>Newznab Wii Category ID</b></label>
+										<br />
+										<input style="width:225px" type="text" name="newznabWiiCat" id="newznabWiiCat" value='""" + config.get('Newznab','wii_category_id').replace('"','') +  """' />
+									</td>
+									<td>
+										<label><b>Newznab Xbox 360 Category ID</b></label>
+										<br />
+										<input style="width:225px" type="text" name="newznabXbox360Cat" id="newznabXbox360Cat" value='""" + config.get('Newznab','xbox360_category_id').replace('"','') +  """' />
+									</td>
+								</tr>
+								<tr><td>&nbsp;</td></tr>
+								<tr>
+									<td colspan="2">
+										<label><b>Newznab API Key</b></label>
+										<br />
+										<input style="width:400px" type="text" name="newznabApi" id="newznabApi" value='""" + config.get('Newznab','api_key').replace('"','') +  """' />
+									</td>
+								</tr>							
+							</table>	
+						</td>						
+					</tr>
+				</table>
+			</p>
+		</div>
+		<div id="notifications-tab">
+			<p>
+				<table cellpadding="5" width="100%">
+					<tr width="100%">
+						<td  style="border:solid 1px" width="45%" valign="top">
+							<label style="float:left"><b><u>Growl</u></b></label>
+								<div style="float:right">
+									<input type="checkbox" name="growlEnabled" id="growlEnabled" value="growlEnabled" """ + growlChecked + """ />Enabled
+								</div>
+							<br />	
+							<table>
+								<tr>
+									<td>
+										<label><b>Growl Host</b></label>
+										<br />
+										<input type="text" name="growlHost" id="growlHost" value='""" + config.get('Notifications','growl_host').replace('"','') +  """' />
+									</td>
+									<td>
+										<label><b>Growl Port</b></label>
+										<br />
+										<input type="text" name="growlPort" id="growlPort" value='""" + config.get('Notifications','growl_port').replace('"','') +  """' />
+									</td>
+									<td>
+										<label><b>Growl Password</b></label>
+										<br />
+										<input type="text" name="growlPassword" id="growlPassword" value='""" + config.get('Notifications','growl_password').replace('"','') +  """' />
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td width="10px">&nbsp;</td>
+						<td style="border:solid 1px" valign="top">
+							<label style="float:left"><b><u>Prowl</u></b></label>
+								<div style="float:right">
+									<input type="checkbox" name="prowlEnabled" id="prowlEnabled" value="prowlEnabled" """ + prowlChecked + """ />Enabled
+								</div>
+							<br />
+							<table>
+								<tr>
+									<td>
+										<label><b>Prowl API Key</b></label>
+										<br />
+										<input style="width:400px" type="text" name="prowlApi" id="prowlApi" value='""" + config.get('Notifications','prowl_api').replace('"','') +  """' />
+									</td>
+								</tr>							
+							</table>	
+						</td>						
+					</tr>
+					<tr><td>&nbsp;</td></tr>
+					<tr width="100%">
+						<td  style="border:solid 1px" width="45%" valign="top">
+							<label style="float:left"><b><u>Notifo</u></b></label>
+								<div style="float:right">
+									<input type="checkbox" name="notifoEnabled" id="notifoEnabled" value="notifoEnabled" """ + notifoChecked + """ />Enabled
+								</div>
+							<br />	
+							<table>
+								<tr>
+									<td>
+										<label><b>Notifo Username</b></label>
+										<br />
+										<input type="text" name="notifoUsername" id="notifoUsername" value='""" + config.get('Notifications','notifo_username').replace('"','') +  """' />
+									</td>
+									<td>
+										<label><b>Notifo API Key</b></label>
+										<br />
+										<input style="width:400px" type="text" name="notifoApi" id="notifoApi" value='""" + config.get('Notifications','notifo_apikey').replace('"','') +  """' />
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td width="10px">&nbsp;</td>						
+					</tr>
+				</table>
+			</p>
+		</div>		
+		</div>
+		<script>
+			$(function(){$("#tabs").tabs();});
+		</script>
                 
-                <label>SABnzbd+ Download Category</label>
-                <input type="text" name="sabCategory" id="sabCategory" value='""" + config.get('Sabnzbd','category').replace('"','') +  """' />
-
-                <h1>NZB Matrix</h1>
-
-                <label>NZB Matrix API Key</label>
-                <input type="text" name="nzbMatrixApi" id="nzbMatrixApi" value='""" + config.get('NZBMatrix','api_key').replace('"','') +  """' />
-
-                <label>NZB Matrix Username</label>
-                <input type="text" name="nzbMatrixUsername" id="nzbMatrixUsername" value='""" + config.get('NZBMatrix','username').replace('"','') +  """' />
-
-
-                <h1>Newznab</h1>
-
-                <label>Newznab Host</label>
-                <input type="text" name="newznabHost" id="newznabHost" value='""" + config.get('Newznab','host').replace('"','') +  """' />
-
-                <label>Newznab Port</label>
-                <input type="text" name="newznabPort" id="newznabPort" value='""" + config.get('Newznab','port').replace('"','') +  """' />
-
-                <label>Newznab API Key</label>
-                <input type="text" name="newznabApi" id="newznabApi" value='""" + config.get('Newznab','api_key').replace('"','') +  """' />
-
-                <label>Newznab Wii Category ID</label>
-                <input type="text" name="newznabWiiCat" id="newznabWiiCat" value='""" + config.get('Newznab','wii_category_id').replace('"','') +  """' />
-
-                <label>Newznab Xbox 360 Category ID</label>
-                <input type="text" name="newznabXbox360Cat" id="newznabXbox360Cat" value='""" + config.get('Newznab','xbox360_category_id').replace('"','') +  """' />
-
+		<br /><br />
+		<div align="right" style="margin-right:20px">
+			<button style="border:0; margin:0; padding:0;clear:both;margin-left:250px;width:125px;height:31px;background:#666666 url(img/button.png) no-repeat;text-align:center;line-height:31px;color:#FFFFFF;font-size:11px;font-weight:bold;" type="submit">Save Settings</button>
+		</div>	
+		</form>
                 
-		<h1>Notifications</h1>
-
-		<label>Prowl API</label>
-                <input type="text" name="prowlApi" id="prowlApi" value='""" + config.get('Notifications','prowl_api').replace('"','') +  """' />
-
-
-		<button type="submit">Save Settings</button>
-                <div class="spacer"></div>
-
                 
-                </form>
-            </div>
+
 
 
 
@@ -682,7 +930,7 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval='',sabCategory=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval='',sabCategory='',growlHost='',growlPort='',growlPassword='',sabnzbdEnabled='',nzbmatrixEnabled='',newznabEnabled='',growlEnabled='',prowlEnabled='',notifoEnabled='',notifoUsername='',notifoApi='',nzbBlackholeEnabled='',nzbBlackholePath=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
@@ -697,6 +945,39 @@ class WebRoot:
 	prowlApi = '"' + prowlApi + '"'
 	gamezUsername = '"' + gamezUsername + '"'
 	gamezPassword = '"' + gamezPassword + '"'
+	growlHost = '"' + growlHost + '"'
+	growlPassword = '"' + growlPassword + '"'
+	notifoUsername = '"' + notifoUsername + '"'
+	notifoApi = '"' + notifoApi + '"'
+	nzbBlackholePath = '"' + nzbBlackholePath + '"'
+	if(sabnzbdEnabled == 'sabnzbdEnabled'):
+            sabnzbdEnabled = "1"
+        else:
+            sabnzbdEnabled = "0"
+	if(nzbmatrixEnabled == 'nzbmatrixEnabled'):
+            nzbmatrixEnabled = "1"
+        else:
+            nzbmatrixEnabled = "0"
+	if(newznabEnabled == 'newznabEnabled'):
+            newznabEnabled = "1"
+        else:
+            newznabEnabled = "0"        
+	if(growlEnabled == 'growlEnabled'):
+            growlEnabled = "1"
+        else:
+            growlEnabled = "0" 
+	if(prowlEnabled == 'prowlEnabled'):
+            prowlEnabled = "1"
+        else:
+            prowlEnabled = "0"       
+	if(notifoEnabled == 'notifoEnabled'):
+            notifoEnabled = "1"
+        else:
+            notifoEnabled = "0"     
+	if(nzbBlackholeEnabled == 'nzbBlackholeEnabled'):
+            nzbBlackholeEnabled = "1"
+        else:
+            nzbBlackholeEnabled = "0"              
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
@@ -713,12 +994,25 @@ class WebRoot:
         config.set('Scheduler','download_interval',downloadInterval)
         config.set('Scheduler','game_list_update_interval',gameListUpdateInterval)
         config.set('SystemGenerated','api_key',gamezApiKey)
+        config.set('SystemGenerated','sabnzbd_enabled',sabnzbdEnabled)
+        config.set('SystemGenerated','nzbmatrix_enabled',nzbmatrixEnabled)
+        config.set('SystemGenerated','newznab_enabled',newznabEnabled)  
+        config.set('SystemGenerated','growl_enabled',growlEnabled)
+        config.set('SystemGenerated','prowl_enabled',prowlEnabled)
+        config.set('SystemGenerated','notifo_enabled',notifoEnabled)
+        config.set('SystemGenerated','blackhole_nzb_enabled',nzbBlackholeEnabled)
         config.set('Newznab','host',newznabHost)
         config.set('Newznab','port',newznabPort)
         config.set('Newznab','wii_category_id',newznabWiiCat)
         config.set('Newznab','xbox360_category_id',newznabXbox360Cat)
         config.set('Newznab','api_key',newznabApi)
 	config.set('Notifications','prowl_api',prowlApi)
+	config.set('Notifications','growl_host',growlHost)
+	config.set('Notifications','growl_port',growlPort)
+	config.set('Notifications','growl_password',growlPassword)
+	config.set('Notifications','notifo_username',notifoUsername)
+	config.set('Notifications','notifo_apikey',notifoApi)
+	config.set('Blackhole','nzb_blackhole_path',nzbBlackholePath)
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)
         status = "Application Settings Updated Successfully. Gamez is restarting. If after 5 seconds, Gamez isn't working, update the Gamez.ini file and re-launch Gamez"

@@ -57,9 +57,10 @@ class RunApp():
             LogEvent("Preparing to run in daemon mode")  
             daemon = Daemonizer(cherrypy.engine)
             daemon.subscribe()        
-        
-        LogEvent("Generating Post Process Script")
-        GenerateSabPostProcessScript()
+        isSabEnabled = config.get('SystemGenerated','sabnzbd_enabled').replace('"','')
+        if(isSabEnabled == "1"):
+            LogEvent("Generating Post Process Script")
+            GenerateSabPostProcessScript()
         RunGameTask()
 
         LogEvent("Getting download interval from config file and invoking scheduler")
@@ -140,8 +141,13 @@ def RunGameTask():
         newznabApi = config.get('Newznab','api_key').replace('"','')
         newznabHost = config.get('Newznab','host').replace('"','')
         newznabPort = config.get('Newznab','port').replace('"','')
+        isSabEnabled = config.get('SystemGenerated','sabnzbd_enabled').replace('"','')
+        isNzbMatrixEnabled = config.get('SystemGenerated','nzbmatrix_enabled').replace('"','')
+        isNewznabEnabled = config.get('SystemGenerated','newznab_enabled').replace('"','')
+        isNzbBlackholeEnabled = config.get('SystemGenerated','blackhole_nzb_enabled').replace('"','')
+        nzbBlackholePath = config.get('Blackhole','nzb_blackhole_path').replace('"','')
         LogEvent("Searching for games")
-        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory)
+        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath)
     except:
         errorMessage = "Major error occured when running scheduled tasks"
         for message in sys.exc_info():
