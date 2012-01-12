@@ -8,7 +8,6 @@ import stat
 from subprocess import call
 from Logger import LogEvent
 import json
-import feedparser
 
 class GameTasks():
 
