@@ -8,10 +8,11 @@ import stat
 from subprocess import call
 from Logger import LogEvent
 import json
+import feedparser
 
 class GameTasks():
 
-    def FindGames(self, nzbmatrixusername, nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath):
+    def FindGames(self, nzbmatrixusername, nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath,isTorrentBlackholeEnabled,isTorrentKATEnabled,torrentBlackholePath):
         if(isSabEnabled == "1"):       
             GameTasks().CheckIfPostProcessExistsInSab(sabnzbdApi,sabnzbdHost,sabnzbdPort)
         nzbmatrixusername = nzbmatrixusername.replace('"','')
@@ -40,7 +41,13 @@ class GameTasks():
                             LogEvent("Checking for game [" + game_name + "] on Newznab")
                             isDownloaded = GameTasks().FindGameOnNewznabServer(game_name,game_id,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,system,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbBlackholeEnabled,nzbBlackholePath)
                     else:
-                        LogEvent("NZB Matrix Settings Incomplete.")            
+                        LogEvent("NZB Matrix Settings Incomplete.")  
+                        
+                if(isTorrentBlackholeEnabled == "1"):
+                	if(isTorrentKATEnabled == "1"):
+                		if(isDownloaded == False):
+                		    LogEvent("Checking for game [" + game_name + "] on KickAss Torrents")
+                		    isDownloaded = GameTasks().FindGameOnKAT(game_id,game_name,system,torrentBlackholePath)
             except:
                 continue
         return
@@ -104,12 +111,10 @@ class GameTasks():
             if(response == "[]"):
                 return False            
             jsonObject = json.loads(response)
-            LogEvent("JSON Parsed")
             for item in jsonObject:
                 nzbID = item["guid"]
                 LogEvent("Game found on Newznab")
                 nzbUrl = "http://" + newznabHost + ":" + newznabPort + "/api?apikey=" + newznabApi + "&t=get&id=" + nzbID
-                LogEvent(nzbUrl)
                 result = GameTasks().DownloadNZB(nzbUrl,game_name,sabnzbdApi,sabnzbdHost,sabnzbdPort,game_id,sabnzbdCategory,isSabEnabled,isNzbBlackholeEnabled,nzbBlackholePath,system)
                 if(result):
                     UpdateStatus(game_id,"Snatched")
@@ -132,6 +137,7 @@ class GameTasks():
             return False
 
     def AddNZBToSab(self,nzbUrl,game_name,sabnzbdApi,sabnzbdHost,sabnzbdPort,game_id,sabnzbdCategory):
+        nzbUrl = urllib.quote(nzbUrl)
         url = "http://" + sabnzbdHost + ":" +  sabnzbdPort + "/sabnzbd/api?mode=addurl&pp=3&apikey=" + sabnzbdApi + "&script=gamezPostProcess.py&name=" + nzbUrl + "&nzbname=[" + game_id + "] - "+ game_name
         if(sabnzbdCategory <> ''):
             url = url + "&cat=" + sabnzbdCategory
@@ -155,7 +161,40 @@ class GameTasks():
     	    LogEvent("Unable to download NZB to blackhole: " + url)
             return False
     	return True
-
+    	
+    def FindGameOnKAT(self,game_id,game_name,system,torrentBlackholePath):
+    	url = "http://www.kickasstorrents.com/json.php?q=" + game_name
+    	try:
+	    opener = urllib.FancyURLopener({})
+	    responseObject = opener.open(url)
+	    response = responseObject.read()
+            responseObject.close()
+            jsonObject = json.loads(response)
+            listObject = jsonObject['list']
+            for record in listObject:
+            	title = record['title']
+                torrentLink = record['torrentLink']
+                category = record['category']
+                print category
+                if(category == "Games"):
+                    result = GameTasks().DownloadTorrent(torrentLink,title,torrentBlackholePath)
+                    if(result == True):
+                        UpdateStatus(game_id,"Snatched")
+                        return result
+        except:
+	    LogEvent("Unable to connect to KickAss Torrents")  
+    	return
+    	
+    def DownloadTorrent(self,torrentUrl,title,torrentBlackholePath):
+    	try:
+    	    dest = torrentBlackholePath + title + ".torrent"
+    	    urllib.urlretrieve(torrentUrl,dest)
+    	    LogEvent("Torrent Added To Blackhole")
+    	except:
+    	    LogEvent("Unable to download torrent to blackhole: " + url)
+            return False
+    	return True
+    	
     def CheckIfPostProcessExistsInSab(self,sabnzbdApi,sabnzbdHost,sabnzbdPort):
         
         path = os.path.abspath("postprocess")

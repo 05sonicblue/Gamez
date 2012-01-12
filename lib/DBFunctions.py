@@ -291,7 +291,7 @@ def AddEventToDB(message):
 
 def GetLog():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT message,created_date FROM gamez_log order by created_date desc"
+    sql = "SELECT message,created_date FROM gamez_log order by created_date desc limit 1000"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -460,7 +460,7 @@ def GetUpcomingGames():
 
 def ApiGetGamesFromTerm(term,system):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT GAME_NAME,SYSTEM FROM GAMES where game_name like '%" + term.replace("'","''") + "%' AND SYSTEM LIKE '%" + system + "%' ORDER BY GAME_NAME ASC"
+    sql = "SELECT GAME_NAME,SYSTEM,COVER FROM GAMES where game_name like '%" + term.replace("'","''") + "%' AND SYSTEM LIKE '%" + system + "%' ORDER BY GAME_NAME ASC"
     data = ""
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -470,13 +470,14 @@ def ApiGetGamesFromTerm(term,system):
         try:
             game_name = str(record[0])
             system = str(record[1])
+            cover = str(record[2])
             rowdata = '{"GameTitle":"' + game_name + '","System":"' + system + '","GameCover":"' + cover + '"},'
             data = data + rowdata
         except:
             continue
     cursor.close()
     data = data[:-1]
-    data = "[" + data + "]"
+    data = '["Games":' + data + ']'
     return data
     
    

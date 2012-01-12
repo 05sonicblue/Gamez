@@ -34,6 +34,26 @@ Examples:
 <br />
 &nbsp;&nbsp;&nbsp;Get list of all games: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=search
 <br />
-&nbsp;&nbsp;&nbsp;Search for games that contain "Super" and are only for the Wii: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=search&term=super&system=wii
+&nbsp;&nbsp;&Anbsp;Search for games that contain "Super" and are only for the Wii: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=search&term=super&system=wii
 
+***GETREQUESTED***
+To Be Added
+<br />
+***ADDREQUESTED***
+To Be Added
+<br />
+***DELETEREQUESTED***
+To Be Added
+<br />
+***UPDATEREQUESTEDSTATUS***
+To Be Added
+<br />
+***UPDATEGAMELIST***
+<br />
+This mode updates the Game List in Gamez from the Gamez.org web service. A json response will be returned with either an error or success message. No additional parameters are needed.
+
+Examples:
+<br />
+&nbsp;&nbsp;&nbsp;Update game list: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=UPDATEGAMELIST
+<br />
 </hr>

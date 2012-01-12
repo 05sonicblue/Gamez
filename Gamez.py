@@ -146,8 +146,11 @@ def RunGameTask():
         isNewznabEnabled = config.get('SystemGenerated','newznab_enabled').replace('"','')
         isNzbBlackholeEnabled = config.get('SystemGenerated','blackhole_nzb_enabled').replace('"','')
         nzbBlackholePath = config.get('Blackhole','nzb_blackhole_path').replace('"','')
+        isTorrentBlackholeEnabled = config.get('SystemGenerated','blackhole_torrent_enabled').replace('"','')
+        isTorrentKATEnabled = config.get('SystemGenerated','torrent_kat_enabled').replace('"','')
+        torrentBlackholePath  = config.get('Blackhole','torrent_blackhole_path').replace('"','')
         LogEvent("Searching for games")
-        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath)
+        lib.GameTasks.GameTasks().FindGames(nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath,isTorrentBlackholeEnabled,isTorrentKATEnabled,torrentBlackholePath)
     except:
         errorMessage = "Major error occured when running scheduled tasks"
         for message in sys.exc_info():

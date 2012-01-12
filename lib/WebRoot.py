@@ -268,6 +268,8 @@ class WebRoot:
         prowlChecked = config.get('SystemGenerated','prowl_enabled').replace('"','')
         notifoChecked = config.get('SystemGenerated','notifo_enabled').replace('"','')
         nzbBlackholeChecked = config.get('SystemGenerated','blackhole_nzb_enabled').replace('"','')
+        torrentBlackholeChecked = config.get('SystemGenerated','blackhole_torrent_enabled').replace('"','')
+        katChecked = config.get('SystemGenerated','torrent_kat_enabled').replace('"','')
         if(sabChecked == "1"):
             sabChecked = "CHECKED"
         else:
@@ -296,7 +298,15 @@ class WebRoot:
             nzbBlackholeChecked = "CHECKED"
         else:
             nzbBlackholeChecked = ""             
-             
+        if(torrentBlackholeChecked == "1"):
+            torrentBlackholeChecked = "CHECKED"
+        else:
+            torrentBlackholeChecked = ""             
+        if(katChecked == "1"):
+            katChecked = "CHECKED"
+        else:
+            katChecked = ""             
+                                          
         html = """
 
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -375,7 +385,7 @@ class WebRoot:
 		<ul>
 			<li><a href="#gamez-tab">Gamez</a></li>
 			<li><a href="#downloaders-tab">Downloaders</a></li>
-			<li><a href="#searchproviders-tab">Search Providers+</a></li>
+			<li><a href="#searchproviders-tab">Search Providers</a></li>
 			<li><a href="#notifications-tab">Notifications</a></li>
 		</ul>
 		<form id="form" name="form" method="get" action="/savesettings">
@@ -491,6 +501,21 @@ class WebRoot:
 									</td>
 								</tr>							
 							</table>	
+							<br />
+							<label style="float:left"><b><u>BitTorrent</u></b></label>
+								<div style="float:right">
+									<input type="checkbox" name="torrentBlackholeEnabled" id="torrentBlackholeEnabled" value="torrentBlackholeEnabled" """ + torrentBlackholeChecked + """ />Enabled
+								</div>
+								<br />
+								<table>
+									<tr>
+										<td>
+											<label><b>BitTorrent Blackhole Path</b></label>
+											<br />
+											<input style="width:400px" type="text" name="torrentBlackholePath" id="torrentBlackholePath" value='""" + config.get('Blackhole','torrent_blackhole_path').replace('"','') +  """' />
+										</td>
+									</tr>							
+							</table>	
 						</td>						
 					</tr>
 				</table>
@@ -525,7 +550,7 @@ class WebRoot:
 							</table>
 						</td>
 						<td width="10px">&nbsp;</td>
-						<td style="border:solid 1px" valign="top">
+						<td style="border:solid 1px" valign="top" rowspan="3">
 							<label style="float:left"><b><u>Newznab</u></b></label>
 								<div style="float:right">
 									<input type="checkbox" name="newznabEnabled" id="newznabEnabled" value="newznabEnabled" """ + newznabChecked + """ />Enabled
@@ -567,6 +592,15 @@ class WebRoot:
 								</tr>							
 							</table>	
 						</td>						
+					</tr>
+					<tr><td>&nbsp;</td></tr>
+					<tr>
+						<td  style="border:solid 1px" width="45%" valign="top">
+							<label style="float:left"><b><u>BitTorrent</u></b></label>
+							<br />
+							<br />
+							<input type="checkbox" name="katEnabled" id="katEnabled" value="katEnabled" """ + katChecked + """ />&nbsp;<b>KickAss Torrents</b>
+						</td>
 					</tr>
 				</table>
 			</p>
@@ -930,7 +964,7 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval='',sabCategory='',growlHost='',growlPort='',growlPassword='',sabnzbdEnabled='',nzbmatrixEnabled='',newznabEnabled='',growlEnabled='',prowlEnabled='',notifoEnabled='',notifoUsername='',notifoApi='',nzbBlackholeEnabled='',nzbBlackholePath=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval='',sabCategory='',growlHost='',growlPort='',growlPassword='',sabnzbdEnabled='',nzbmatrixEnabled='',newznabEnabled='',growlEnabled='',prowlEnabled='',notifoEnabled='',notifoUsername='',notifoApi='',nzbBlackholeEnabled='',nzbBlackholePath='',torrentBlackholeEnabled='',torrentBlackholePath='',katEnabled=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
@@ -950,6 +984,7 @@ class WebRoot:
 	notifoUsername = '"' + notifoUsername + '"'
 	notifoApi = '"' + notifoApi + '"'
 	nzbBlackholePath = '"' + nzbBlackholePath + '"'
+	torrentBlackholePath = '"' + torrentBlackholePath + '"'
 	if(sabnzbdEnabled == 'sabnzbdEnabled'):
             sabnzbdEnabled = "1"
         else:
@@ -977,7 +1012,15 @@ class WebRoot:
 	if(nzbBlackholeEnabled == 'nzbBlackholeEnabled'):
             nzbBlackholeEnabled = "1"
         else:
-            nzbBlackholeEnabled = "0"              
+            nzbBlackholeEnabled = "0"    
+	if(torrentBlackholeEnabled == 'torrentBlackholeEnabled'):
+            torrentBlackholeEnabled = "1"
+        else:
+            torrentBlackholeEnabled = "0"  
+	if(katEnabled == 'katEnabled'):
+            katEnabled = "1"
+        else:
+            katEnabled = "0"            
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
@@ -1001,6 +1044,8 @@ class WebRoot:
         config.set('SystemGenerated','prowl_enabled',prowlEnabled)
         config.set('SystemGenerated','notifo_enabled',notifoEnabled)
         config.set('SystemGenerated','blackhole_nzb_enabled',nzbBlackholeEnabled)
+        config.set('SystemGenerated','blackhole_torrent_enabled',torrentBlackholeEnabled)
+        config.set('SystemGenerated','torrent_kat_enabled',katEnabled)
         config.set('Newznab','host',newznabHost)
         config.set('Newznab','port',newznabPort)
         config.set('Newznab','wii_category_id',newznabWiiCat)
@@ -1013,6 +1058,7 @@ class WebRoot:
 	config.set('Notifications','notifo_username',notifoUsername)
 	config.set('Notifications','notifo_apikey',notifoApi)
 	config.set('Blackhole','nzb_blackhole_path',nzbBlackholePath)
+	config.set('Blackhole','torrent_blackhole_path',torrentBlackholePath)	
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)
         status = "Application Settings Updated Successfully. Gamez is restarting. If after 5 seconds, Gamez isn't working, update the Gamez.ini file and re-launch Gamez"
@@ -1034,8 +1080,16 @@ class WebRoot:
         elif(api_key <> systemApiKey):
             return json.dumps({"Error" : "Invalid API Key"})
         else:
-            if(mode == 'search'):
+            if(mode == 'SEARCH'):
                 return ApiGetGamesFromTerm(term,system)
+            elif(mode == 'UPDATEGAMELIST'):
+            	try:
+            	    AddWiiGamesIfMissing()
+		    AddXbox360GamesIfMissing()
+		    AddComingSoonGames()
+		    return json.dumps({"Response":"Game list has been updated successfully"})
+            	except:
+            	    return json.dumps({"Error" : "Error Updating Game List"})
             else:
                 response = {"Error" : mode + " Mode Not Implemented"}
 

@@ -178,6 +178,10 @@ def CheckConfigForAllKeys(app_path):
     if(config.has_option('Blackhole','nzb_blackhole_path') == False):
 	config.set('Blackhole','nzb_blackhole_path','""')
 	changesMade = True	
+
+    if(config.has_option('Blackhole','torrent_blackhole_path') == False):
+	config.set('Blackhole','torrent_blackhole_path','""')
+	changesMade = True	
 	
     if(changesMade):
         with open(configFilePath,'wb') as configFile:
