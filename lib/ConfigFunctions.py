@@ -129,6 +129,10 @@ def CheckConfigForAllKeys(app_path):
     if(config.has_option('SystemGenerated','blackhole_torrent_enabled') == False):
         config.set('SystemGenerated','blackhole_torrent_enabled','0')
         changesMade = True         
+
+    if(config.has_option('SystemGenerated','torrent_kat_enabled') == False):
+        config.set('SystemGenerated','torrent_kat_enabled','0')
+        changesMade = True  
         
     if(config.has_option('SystemGenerated','api_key') == False):
         apiKey = base64.b64encode(hashlib.sha256( str(random.getrandbits(256)) ).digest(), random.choice(['rA','aZ','gQ','hH','hG','aR','DD'])).rstrip('==')
