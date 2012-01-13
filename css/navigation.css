@@ -94,7 +94,7 @@ div#menu ul ul {
     left: -999em;
     width: 163px;
     padding: 5px 0 0 0;
-    background: rgb(45,45,45);
+    background: #99B4FF;
     margin-top:1px;
 }
 div#menu ul ul a {
@@ -103,7 +103,7 @@ div#menu ul ul a {
     float: none;
     display: block;
     line-height: 24px;
-    color: rgb(169,169,169);
+    color: Green;
 }
 div#menu ul ul span {
     margin-top: 0;

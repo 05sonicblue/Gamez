@@ -41,7 +41,11 @@ def CheckConfigForAllKeys(app_path):
     if(config.has_section('Notifications') == False):
         config.add_section('Notifications')
         changesMade = True
-     
+
+    if(config.has_section('Folders') == False):
+        config.add_section('Folders')
+        changesMade = True
+    
     if(config.has_option('global','server.socket_host') == False):
         config.set('global','server.socket_host','"127.0.0.1"')
         changesMade = True
@@ -134,6 +138,30 @@ def CheckConfigForAllKeys(app_path):
         config.set('SystemGenerated','torrent_kat_enabled','0')
         changesMade = True  
         
+    if(config.has_option('SystemGenerated','process_torrent_download_folder_enabled') == False):
+        config.set('SystemGenerated','process_torrent_download_folder_enabled','0')
+        changesMade = True     
+        
+    if(config.has_option('SystemGenerated','process_nzb_download_folder_enabled') == False):
+        config.set('SystemGenerated','process_nzb_download_folder_enabled','0')
+        changesMade = True          
+        
+    if(config.has_option('SystemGenerated','process_sabnzbd_download_folder_enabled') == False):
+        config.set('SystemGenerated','process_sabnzbd_download_folder_enabled','0')
+        changesMade = True     
+        
+    if(config.has_option('SystemGenerated','process_download_folder_wii_enabled') == False):
+        config.set('SystemGenerated','process_download_folder_wii_enabled','0')
+        changesMade = True   
+        
+    if(config.has_option('SystemGenerated','process_download_folder_xbox360_enabled') == False):
+        config.set('SystemGenerated','process_download_folder_xbox360_enabled','0')
+        changesMade = True         
+        
+    if(config.has_option('SystemGenerated','default_search') == False):
+        config.set('SystemGenerated','default_search','"---"')
+        changesMade = True  
+        
     if(config.has_option('SystemGenerated','api_key') == False):
         apiKey = base64.b64encode(hashlib.sha256( str(random.getrandbits(256)) ).digest(), random.choice(['rA','aZ','gQ','hH','hG','aR','DD'])).rstrip('==')
         config.set('SystemGenerated','api_key','"' + apiKey + '"')
@@ -189,6 +217,26 @@ def CheckConfigForAllKeys(app_path):
 
     if(config.has_option('Blackhole','torrent_blackhole_path') == False):
 	config.set('Blackhole','torrent_blackhole_path','""')
+	changesMade = True	
+	
+    if(config.has_option('Folders','torrent_blackhole_path') == False):
+	config.set('Folders','torrent_completed','""')
+	changesMade = True	
+	
+    if(config.has_option('Folders','torrent_blackhole_path') == False):
+	config.set('Folders','nzb_completed','""')
+	changesMade = True	
+	
+    if(config.has_option('Folders','torrent_blackhole_path') == False):
+	config.set('Folders','sabnzbd_completed','""')
+	changesMade = True
+	
+    if(config.has_option('Folders','wii_destination') == False):
+	config.set('Folders','wii_destination','""')
+	changesMade = True	
+	
+    if(config.has_option('Folders','xbox360_destination') == False):
+	config.set('Folders','xbox360_destination','""')
 	changesMade = True	
 	
     if(changesMade):

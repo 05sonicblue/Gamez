@@ -60,8 +60,7 @@ class GameTasks():
         else:
             LogEvent("Unrecognized System")
             return False
-        LogEvent(catToUse)
-        url = "http://api.nzbmatrix.com/v1.1/search.php?search=" + game_name + "&num=1&cat=" + catToUse + "&username=" + username + "&apikey=" + api
+        url = "http://api.nzbmatrix.com/v1.1/search.php?search=" + game_name + "&num=1&catid=" + catToUse + "&username=" + username + "&apikey=" + api
         
         try:
             opener = urllib.FancyURLopener({})
@@ -194,11 +193,25 @@ class GameTasks():
             return False
     	return True
     	
+    def CheckSabDownloadPath(self,sabnzbdApi,sabnzbdHost,sabnzbdPort):
+    	url = "http://" + sabnzbdHost + ":" + sabnzbdPort + "/sabnzbd/api?mode=get_config&apikey=" + sabnzbdApi + "&section=misc&keyword=complete_dir"
+    	try:
+    	    opener = urllib.FancyURLopener({})
+	    responseObject = opener.open(url)
+	    response = responseObject.read()
+            responseObject.close()
+            completedDir = response.split(":")[2].replace("'","").replace(" ","").replace("{","").replace("}","").replace("\n","")
+            return completedDir
+    	except:
+    	    LogEvent("Unable to get Sab Download Complete Directory")
+    	    return ""
+    	return
+    	
     def CheckIfPostProcessExistsInSab(self,sabnzbdApi,sabnzbdHost,sabnzbdPort):
         
         path = os.path.abspath("postprocess")
         srcPath = os.path.join(path,"gamezPostProcess.py")
-        url = "http://" + sabnzbdHost + ":" + sabnzbdPort + "/sabnzbd/api?mode=get_config&apikey=" + sabnzbdApi + "&section=misc&keyword=script_dir"
+        url = urllib.quote("http://" + sabnzbdHost + ":" + sabnzbdPort + "/sabnzbd/api?mode=get_config&apikey=" + sabnzbdApi + "&section=misc&keyword=script_dir")
         try:
             opener = urllib.FancyURLopener({})
             responseObject = opener.open(url)

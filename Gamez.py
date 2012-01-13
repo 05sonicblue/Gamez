@@ -174,9 +174,24 @@ def RunGameListUpdaterTask():
 
 if __name__ == '__main__':
     app_path = sys.path[0]
+    LogEvent("Checking DB")
     ValidateDB()
-    LogEvent("Checking config file for completeness")
     CheckConfigForAllKeys(app_path)
+    config = ConfigParser.RawConfigParser()
+    configFilePath = os.path.join(app_path,'Gamez.ini')
+    config.read(configFilePath)
+    sabnzbdHost = config.get('Sabnzbd','host').replace('"','')
+    sabnzbdPort = config.get('Sabnzbd','port').replace('"','')
+    sabnzbdApi = config.get('Sabnzbd','api_key').replace('"','')
+    LogEvent("Attempting to get download completed directory from Sabnzbd")
+    sabCompleted = lib.GameTasks.GameTasks().CheckSabDownloadPath(sabnzbdApi,sabnzbdHost,sabnzbdPort)
+    if(sabCompleted <> ""):
+    	LogEvent("Setting Value")
+    	config.set('Folders','sabnzbd_completed','"' + sabCompleted + '"')
+    	LogEvent("Trying to save")
+    	with open(configFilePath,'wb') as configFile:
+            config.write(configFile)
+    LogEvent("Checking config file for completeness")    
     isToDaemonize = 0
     params = sys.argv
     for param in params:

@@ -1,7 +1,7 @@
 import cherrypy
 import json
 import os
-from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,ApiGetGamesFromTerm,AddComingSoonGames,GetUpcomingGames
+from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,ApiGetGamesFromTerm,AddComingSoonGames,GetUpcomingGames,AddGameUpcomingToDb
 from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVersion
 import ConfigParser
 from time import sleep
@@ -18,9 +18,19 @@ class WebRoot:
         WebRoot.appPath = app_path
 
     @cherrypy.expose
-    def index(self,status_message='',version=''):
+    def index(self,status_message='',version='',filter=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
+        config = ConfigParser.RawConfigParser()
+        configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
+        config.read(configFilePath)
+        defaultSearch = config.get('SystemGenerated','default_search').replace('"','')
+        if(defaultSearch == "Wii"):
+            defaultSearch = "<option>---</option><option selected>Wii</option><option>Xbox360</option>"
+        elif(defaultSearch == "Xbox360"):
+            defaultSearch = "<option>---</option><option>Wii</option><option selected>Xbox360</option>"
+        else:
+            defaultSearch = "<option selected>---</option><option>Wii</option><option>Xbox360</option>"        
         html = """
 
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -52,6 +62,7 @@ class WebRoot:
                         <a href="/">
                             Home
                         </a>
+                        <ul><li><a href="/?filter=Wanted">Wanted Games</a></li><li><a href="/?filter=Snatched">Snatched Games</a></li><li><a href="/?filter=Downloaded">Downloaded Games</a></li></ul>
                     </li>
                     <li class="parent">
                         <a href="/settings">
@@ -78,7 +89,7 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
-                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        <select id="systemDropDown">""" + defaultSearch + """</select>
                         &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
@@ -105,9 +116,9 @@ class WebRoot:
             </div>
             <div style="visibility:hidden"><a href="http://apycom.com/">jQuery Menu by Apycom</a></div>
             <div id="container">"""
-        db_result = GetRequestedGames()
+        db_result = GetRequestedGames(filter)
         if(db_result == ''):
-            html  = html + """No games added. Try searching for some."""
+            html  = html + """No games to show. Try searching for some."""
         else:
             html = html + """
                 <script>function UpdateGameStatus(status,db_id){var redirectUrl = '/updatestatus?game_id=' + db_id + '&status=' + status;location.href=redirectUrl;}</script>
@@ -145,6 +156,16 @@ class WebRoot:
     def search(self,term='',system=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
+        config = ConfigParser.RawConfigParser()
+        configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
+        config.read(configFilePath)
+        defaultSearch = config.get('SystemGenerated','default_search').replace('"','')
+        if(defaultSearch == "Wii"):
+            defaultSearch = "<option>---</option><option selected>Wii</option><option>Xbox360</option>"
+        elif(defaultSearch == "Xbox360"):
+            defaultSearch = "<option>---</option><option>Wii</option><option selected>Xbox360</option>"
+        else:
+            defaultSearch = "<option selected>---</option><option>Wii</option><option>Xbox360</option>"              
         html = """
 
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -193,7 +214,7 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
-                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        <select id="systemDropDown">""" + defaultSearch + """</select>
                         &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
@@ -260,7 +281,6 @@ class WebRoot:
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
-        #checkboxSettings
         sabChecked = config.get('SystemGenerated','sabnzbd_enabled').replace('"','')
         nzbmatrixChecked = config.get('SystemGenerated','nzbmatrix_enabled').replace('"','')
         newznabChecked = config.get('SystemGenerated','newznab_enabled').replace('"','')
@@ -270,6 +290,14 @@ class WebRoot:
         nzbBlackholeChecked = config.get('SystemGenerated','blackhole_nzb_enabled').replace('"','')
         torrentBlackholeChecked = config.get('SystemGenerated','blackhole_torrent_enabled').replace('"','')
         katChecked = config.get('SystemGenerated','torrent_kat_enabled').replace('"','')
+        
+        sabDownloadProcessChecked = config.get('SystemGenerated','process_sabnzbd_download_folder_enabled').replace('"','')
+        nzbDownloadProcessChecked = config.get('SystemGenerated','process_nzb_download_folder_enabled').replace('"','')
+        torrentDownloadProcessChecked = config.get('SystemGenerated','process_torrent_download_folder_enabled').replace('"','')
+        downloadProcessWiiChecked = config.get('SystemGenerated','process_download_folder_wii_enabled').replace('"','')
+        downloadProcessXbox360Checked = config.get('SystemGenerated','process_download_folder_xbox360_enabled').replace('"','')
+        
+        defaultSearch = config.get('SystemGenerated','default_search').replace('"','')
         if(sabChecked == "1"):
             sabChecked = "CHECKED"
         else:
@@ -305,8 +333,34 @@ class WebRoot:
         if(katChecked == "1"):
             katChecked = "CHECKED"
         else:
-            katChecked = ""             
-                                          
+            katChecked = ""          
+
+        if(sabDownloadProcessChecked == "1"):
+            sabDownloadProcessChecked = "CHECKED"
+        else:
+            sabDownloadProcessChecked = ""  
+        if(nzbDownloadProcessChecked == "1"):
+            nzbDownloadProcessChecked = "CHECKED"
+        else:
+            nzbDownloadProcessChecked = ""  
+        if(torrentDownloadProcessChecked == "1"):
+            torrentDownloadProcessChecked = "CHECKED"
+        else:
+            torrentDownloadProcessChecked = ""  
+        if(downloadProcessWiiChecked == "1"):
+            downloadProcessWiiChecked = "CHECKED"
+        else:
+            downloadProcessWiiChecked = ""  
+        if(downloadProcessXbox360Checked == "1"):
+            downloadProcessXbox360Checked = "CHECKED"
+        else:
+            downloadProcessXbox360Checked = ""              
+        if(defaultSearch == "Wii"):
+            defaultSearch = "<option>---</option><option selected>Wii</option><option>Xbox360</option>"
+        elif(defaultSearch == "Xbox360"):
+            defaultSearch = "<option>---</option><option>Wii</option><option selected>Xbox360</option>"
+        else:
+            defaultSearch = "<option selected>---</option><option>Wii</option><option>Xbox360</option>"
         html = """
 
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -356,7 +410,7 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
-                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        <select id="systemDropDown">""" + defaultSearch + """</select>
                         &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
@@ -368,7 +422,8 @@ class WebRoot:
                                     dataType:'json'
                                 }
                             );
-                            $("button").button().click(function(){
+                            $("#searchButton").button().click(function(){
+                            	var searchText = document.getElementById("search").value;
                                 var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
 				if(system == "---")
 				{
@@ -387,6 +442,7 @@ class WebRoot:
 			<li><a href="#downloaders-tab">Downloaders</a></li>
 			<li><a href="#searchproviders-tab">Search Providers</a></li>
 			<li><a href="#notifications-tab">Notifications</a></li>
+			<li><a href="#folders-tab">Folders</a></li>
 		</ul>
 		<form id="form" name="form" method="get" action="/savesettings">
 		<div id="gamez-tab">
@@ -439,6 +495,14 @@ class WebRoot:
 							<br />
 							<input style="width:520px" type="text" name="gamezApiKey" id="gamezApiKey" value='""" + config.get('SystemGenerated','api_key').replace('"','') +  """' />
 
+						</td>
+					</tr>
+					<tr><td colspan="4"></td></tr>
+					<tr>
+						<td>
+							<label><b>Default System for Search</b></label>
+							<br />
+							<select name="defaultSearch" id="defaultSearch" style="width:200px">""" + defaultSearch + """</select>
 						</td>
 					</tr>
 				</table>
@@ -680,7 +744,75 @@ class WebRoot:
 					</tr>
 				</table>
 			</p>
-		</div>		
+		</div>	
+		<div id="folders-tab">
+			<p>
+				NOTE: This page isn't implemented yet. The layout is merely here to implement in a future release
+				<table cellpadding="5" width="100%">
+					<tr width="100%">
+						<td  style="border:solid 1px" width="45%" valign="top">
+							<br />
+							<input type="checkbox" name="processSabDirectoryEnabled" id="processSabDirectoryEnabled" value="processSabDirectoryEnabled" """ + sabDownloadProcessChecked + """ />
+							<b>Post Process Sabnzbd Download Directory</b>
+							<br /><br />
+							<input type="checkbox" name="processTorrentsDirectoryEnabled" id="processTorrentsDirectoryEnabled" value="processTorrentsDirectoryEnabled" """ + torrentDownloadProcessChecked + """ />
+							<b>Post Process Blackhole Torrents Directory</b>
+							<br /><br />
+							<input type="checkbox" name="processNzbsDirectoryEnabled" id="processNzbsDirectoryEnabled" value="processNzbsDirectoryEnabled" """ + nzbDownloadProcessChecked + """ />
+							<b>Post Process Blackhole NZB's Directory</b>
+							<br /><br />
+							<input type="checkbox" name="processWiiEnabled" id="processWiiEnabled" value="processWiiEnabled" """ + downloadProcessWiiChecked + """ />
+							<b>Post Process Wii Games</b>
+							<br /><br />
+							<input type="checkbox" name="processXbox360Enabled" id="processXbox360Enabled" value="processXbox360Enabled" """ + downloadProcessXbox360Checked + """ />
+							<b>Post Process XBOX 360 Games</b>
+						</td>
+						<td width="10px">&nbsp;</td>
+						<td style="border:solid 1px" valign="top">
+							<legend><b><u>Folders</u></b></legend>
+							<br />
+							<table>
+								<tr>
+									<td>
+										<label><b>Blackhole Torrent Download Directory</b></label>
+										<br />
+										<input style="width:400px" type="text" name="torrentBlackholeDownloadDirectory" id="torrentBlackholeDownloadDirectory" value='""" + config.get('Folders','torrent_completed').replace('"','') +  """' />
+									</td>
+								</tr>	
+								<tr>
+									<td>
+										<label><b>Blackhole NZB's Download Directory</b></label>
+										<br />
+										<input style="width:400px" type="text" name="nzbBlackholeDownloadDirectory" id="nzbBlackholeDownloadDirectory" value='""" + config.get('Folders','nzb_completed').replace('"','') +  """' />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label><b>Sabnzbd Download Directory</b></label>
+										<br />
+										<input style="width:400px" type="text" name="sabDownloadDirectory" id="sabDownloadDirectory" value='""" + config.get('Folders','sabnzbd_completed').replace('"','') +  """' />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label><b>Wii Destination Directory</b></label>
+										<br />
+										<input style="width:400px" type="text" name="wiiDestination" id="wiiDestination" value='""" + config.get('Folders','wii_destination').replace('"','') +  """' />
+									</td>
+								</tr>	
+								<tr>
+									<td>
+										<label><b>XBOX 360 Destination Directory</b></label>
+										<br />
+										<input style="width:400px" type="text" name="xbox360Destination" id="xbox360Destination" value='""" + config.get('Folders','xbox360_destination').replace('"','') +  """' />
+									</td>
+								</tr>								
+							</table>	
+						</td>						
+					</tr>
+				</table>
+			</p>
+		</div>
 		</div>
 		<script>
 			$(function(){$("#tabs").tabs();});
@@ -708,6 +840,16 @@ class WebRoot:
     def log(self,status_message='',version=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
+        config = ConfigParser.RawConfigParser()
+        configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
+        config.read(configFilePath)
+        defaultSearch = config.get('SystemGenerated','default_search').replace('"','')
+        if(defaultSearch == "Wii"):
+            defaultSearch = "<option>---</option><option selected>Wii</option><option>Xbox360</option>"
+        elif(defaultSearch == "Xbox360"):
+            defaultSearch = "<option>---</option><option>Wii</option><option selected>Xbox360</option>"
+        else:
+            defaultSearch = "<option selected>---</option><option>Wii</option><option>Xbox360</option>"              
         html = """
 
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -757,7 +899,7 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
-                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        <select id="systemDropDown">""" + defaultSearch + """</select>
                         &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
@@ -770,6 +912,7 @@ class WebRoot:
                                 }
                             );
                             $("button").button().click(function(){
+                            	var searchText = document.getElementById("search").value;
                                 var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
 				if(system == "---")
 				{
@@ -802,7 +945,7 @@ class WebRoot:
               </table>
               <div style="float:right;"><button name="clearLogBtn" id="clearLogBtn" class="clear-log-button" onclick="location.href='/clearlog'">Clear Log</button></div>
               <script>$(document).ready(function() {
-	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false});});
+	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false,"iDisplayLength":25});});
               </script>
              """
         html = html + """
@@ -818,6 +961,16 @@ class WebRoot:
     def comingsoon(self):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
+        config = ConfigParser.RawConfigParser()
+        configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
+        config.read(configFilePath)
+        defaultSearch = config.get('SystemGenerated','default_search').replace('"','')
+        if(defaultSearch == "Wii"):
+            defaultSearch = "<option>---</option><option selected>Wii</option><option>Xbox360</option>"
+        elif(defaultSearch == "Xbox360"):
+            defaultSearch = "<option>---</option><option>Wii</option><option selected>Xbox360</option>"
+        else:
+            defaultSearch = "<option selected>---</option><option>Wii</option><option>Xbox360</option>"              
         html = """
 
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -867,7 +1020,7 @@ class WebRoot:
                     <div class=ui-widget>
                         <INPUT id=search />
                         &nbsp;
-                        <select id="systemDropDown"><option>---</option><option>Xbox360</option><option>Wii</option></select>
+                        <select id="systemDropDown">""" + defaultSearch + """</select>
                         &nbsp;
                         <button style="margin-top:8px" id="searchButton" class="ui-widget" style="font-size:15px" name="searchButton" type="submit">Search</button> 
                         <script>
@@ -880,6 +1033,7 @@ class WebRoot:
                                 }
                             );
                             $("button").button().click(function(){
+                            	var searchText = document.getElementById("search").value;
                                 var system = document.getElementById("systemDropDown").options[document.getElementById("systemDropDown").selectedIndex].value;
 				if(system == "---")
 				{
@@ -900,6 +1054,7 @@ class WebRoot:
             html = html + """
               <table cellpadding="0" cellspacing="0" border="0" class="display" id="searchresults">
                 <thead>
+                    <th>Download</th>
                     <th>Game Name</th>
                     <th>Release Date</th>
                     <th>System</th>
@@ -911,7 +1066,7 @@ class WebRoot:
                 </tbody>
               </table>
               <script>$(document).ready(function() {
-	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false});});
+	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false,"iDisplayLength":25});});
               </script>
              """
         html = html + """
@@ -943,6 +1098,13 @@ class WebRoot:
             os.chdir(WebRoot.appPath)
         AddGameToDb(dbid,'Wanted')
         raise cherrypy.InternalRedirect('/')
+        
+    @cherrypy.expose
+    def addgameupcoming(self,dbid): 
+        if(os.name <> 'nt'):
+            os.chdir(WebRoot.appPath)
+        AddGameUpcomingToDb(dbid,'Wanted')
+        raise cherrypy.InternalRedirect('/')
 
     @cherrypy.expose
     def removegame(self,dbid):
@@ -964,7 +1126,7 @@ class WebRoot:
             raise cherrypy.InternalRedirect("/?status_message=" + status)
 
     @cherrypy.expose
-    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval='',sabCategory='',growlHost='',growlPort='',growlPassword='',sabnzbdEnabled='',nzbmatrixEnabled='',newznabEnabled='',growlEnabled='',prowlEnabled='',notifoEnabled='',notifoUsername='',notifoApi='',nzbBlackholeEnabled='',nzbBlackholePath='',torrentBlackholeEnabled='',torrentBlackholePath='',katEnabled=''):
+    def savesettings(self,cherrypyHost='', nzbMatrixUsername='', downloadInterval=3600, sabPort='', nzbMatrixApi='', sabApi='', cherrypyPort='', sabHost='',gamezApiKey='',newznabHost='',newznabPort='',newznabApi='',newznabWiiCat='',newznabXbox360Cat='',prowlApi='',gamezUsername='',gamezPassword='',gameListUpdateInterval='',sabCategory='',growlHost='',growlPort='',growlPassword='',sabnzbdEnabled='',nzbmatrixEnabled='',newznabEnabled='',growlEnabled='',prowlEnabled='',notifoEnabled='',notifoUsername='',notifoApi='',nzbBlackholeEnabled='',nzbBlackholePath='',torrentBlackholeEnabled='',torrentBlackholePath='',katEnabled='',defaultSearch='',wiiDestination='', xbox360Destination='', nzbBlackholeDownloadDirectory='', torrentBlackholeDownloadDirectory='', processTorrentsDirectoryEnabled='', sabDownloadDirectory='', processXbox360Enabled='', processWiiEnabled='', processNzbsDirectoryEnabled='', processSabDirectoryEnabled=''):
         cherrypyHost = '"' + cherrypyHost + '"'
         nzbMatrixUsername = '"' + nzbMatrixUsername + '"'
         nzbMatrixApi = '"' + nzbMatrixApi + '"'
@@ -985,6 +1147,12 @@ class WebRoot:
 	notifoApi = '"' + notifoApi + '"'
 	nzbBlackholePath = '"' + nzbBlackholePath + '"'
 	torrentBlackholePath = '"' + torrentBlackholePath + '"'
+	wiiDestination = '"' + wiiDestination + '"'
+	xbox360Destination = '"' + xbox360Destination + '"'
+	nzbBlackholeDownloadDirectory = '"' + nzbBlackholeDownloadDirectory + '"'
+	torrentBlackholeDownloadDirectory = '"' + torrentBlackholeDownloadDirectory + '"'
+	sabDownloadDirectory = '"' + sabDownloadDirectory + '"'
+	defaultSearch = '"' + defaultSearch + '"'
 	if(sabnzbdEnabled == 'sabnzbdEnabled'):
             sabnzbdEnabled = "1"
         else:
@@ -1020,7 +1188,27 @@ class WebRoot:
 	if(katEnabled == 'katEnabled'):
             katEnabled = "1"
         else:
-            katEnabled = "0"            
+            katEnabled = "0"  
+	if(processTorrentsDirectoryEnabled == 'processTorrentsDirectoryEnabled'):
+            processTorrentsDirectoryEnabled = "1"
+        else:
+            processTorrentsDirectoryEnabled = "0"   
+	if(processNzbsDirectoryEnabled == 'processNzbsDirectoryEnabled'):
+            processNzbsDirectoryEnabled = "1"
+        else:
+            processNzbsDirectoryEnabled = "0"   
+	if(processSabDirectoryEnabled == 'processSabDirectoryEnabled'):
+            processSabDirectoryEnabled = "1"
+        else:
+            processSabDirectoryEnabled = "0"   
+	if(processXbox360Enabled == 'processXbox360Enabled'):
+            processXbox360Enabled = "1"
+        else:
+            processXbox360Enabled = "0"               
+	if(processWiiEnabled == 'processWiiEnabled'):
+            processWiiEnabled = "1"
+        else:
+            processWiiEnabled = "0"               
         config = ConfigParser.RawConfigParser()
         configFilePath = os.path.join(WebRoot.appPath,'Gamez.ini')
         config.read(configFilePath)
@@ -1046,6 +1234,12 @@ class WebRoot:
         config.set('SystemGenerated','blackhole_nzb_enabled',nzbBlackholeEnabled)
         config.set('SystemGenerated','blackhole_torrent_enabled',torrentBlackholeEnabled)
         config.set('SystemGenerated','torrent_kat_enabled',katEnabled)
+        config.set('SystemGenerated','default_search',defaultSearch)
+        config.set('SystemGenerated','process_torrent_download_folder_enabled',processTorrentsDirectoryEnabled)
+        config.set('SystemGenerated','nzb_completed',processNzbsDirectoryEnabled)
+        config.set('SystemGenerated','process_sabnzbd_download_folder_enabled',processSabDirectoryEnabled)
+        config.set('SystemGenerated','process_download_folder_xbox360_enabled',processXbox360Enabled)
+        config.set('SystemGenerated','process_download_folder_wii_enabled',processWiiEnabled)
         config.set('Newznab','host',newznabHost)
         config.set('Newznab','port',newznabPort)
         config.set('Newznab','wii_category_id',newznabWiiCat)
@@ -1059,6 +1253,12 @@ class WebRoot:
 	config.set('Notifications','notifo_apikey',notifoApi)
 	config.set('Blackhole','nzb_blackhole_path',nzbBlackholePath)
 	config.set('Blackhole','torrent_blackhole_path',torrentBlackholePath)	
+	config.set('Folders','torrent_completed',torrentBlackholeDownloadDirectory)	
+	config.set('Folders','nzb_completed',nzbBlackholeDownloadDirectory)
+	config.set('Folders','sabnzbd_completed',sabDownloadDirectory)
+	config.set('Folders','xbox360_destination',xbox360Destination)
+	config.set('Folders','wii_destination',wiiDestination)
+	
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)
         status = "Application Settings Updated Successfully. Gamez is restarting. If after 5 seconds, Gamez isn't working, update the Gamez.ini file and re-launch Gamez"

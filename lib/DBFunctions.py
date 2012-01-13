@@ -71,9 +71,34 @@ def AddGameToDb(db_id,status):
     cursor.close()
     return
 
-def GetRequestedGames():
+def AddGameUpcomingToDb(db_id,status):
+    LogEvent("Adding game in 'Wanted' status")
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT id,game_name,game_type,status,system,cover FROM requested_games order by game_name asc"
+    sql = "select GameTitle,system from comingsoon where ID = '" + db_id + "'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()[0]
+    game_name = str(result[0])
+    system = str(result[1])
+    game_type = "Game"
+    cover = "/css/navigation_images/no-cover.jpg"
+    cursor.close()
+    sql = "insert into requested_games(GAME_NAME,SYSTEM,GAME_TYPE,status,cover) values('" + game_name.replace("'","''") + "','" + system + "','" + game_type + "','" + status + "','" + cover + "')"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    connection.commit()
+    cursor.close()
+    return    
+    comingsoon
+
+def GetRequestedGames(filter=''):
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    if(filter <> ''):
+        sql = "SELECT id,game_name,game_type,status,system,cover FROM requested_games Where status='" + filter + "' order by game_name asc"
+    else:        
+    	sql = "SELECT id,game_name,game_type,status,system,cover FROM requested_games order by game_name asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -137,7 +162,7 @@ def UpdateStatus(game_id,status):
         game_name = str(record[0])
         system = str(record[1])
     cursor.close()    
-    sql = "update requested_games set status='" + status + "' where game_name = '" + game_name + "' and system = '" + system + "'"
+    sql = "update requested_games set status='" + status + "' where game_name = '" + game_name.replace("'","''") + "' and system = '" + system + "'"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)
@@ -440,7 +465,7 @@ def AddComingSoonGames():
         
 def GetUpcomingGames():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT gametitle,strftime('%m/%d/%Y',releasedate),system FROM comingsoon order by releasedate asc"
+    sql = "SELECT gametitle,strftime('%m/%d/%Y',releasedate),system,id FROM comingsoon order by releasedate asc"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -451,7 +476,8 @@ def GetUpcomingGames():
             gametitle = str(record[0])
             releasedate = str(record[1])
             system = str(record[2])
-            rowdata = "<tr><td>" + gametitle + "</td><td>" + releasedate + "</td><td>" + system + "</td></tr>"
+            db_id = str(record[3])
+            rowdata = "<tr><td><a href='addgameupcoming?dbid=" + db_id + "'>Download</a></td><td>" + gametitle + "</td><td>" + releasedate + "</td><td>" + system + "</td></tr>"
             data = data + rowdata
         except:
             continue

@@ -37,17 +37,29 @@ Examples:
 &nbsp;&nbsp;&Anbsp;Search for games that contain "Super" and are only for the Wii: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=search&term=super&system=wii
 
 ***GETREQUESTED***
-To Be Added
 <br />
+To Be Added
+<br /><br />
 ***ADDREQUESTED***
-To Be Added
 <br />
+To Be Added
+<br /><br />
 ***DELETEREQUESTED***
-To Be Added
 <br />
+To Be Added
+<br /><br />
 ***UPDATEREQUESTEDSTATUS***
-To Be Added
 <br />
+To Be Added
+<br /><br />
+***SEARCHUPCOMING***
+<br />
+To Be Added
+<br /><br />
+***ADDUPCOMINGTOREQUESTED***
+<br />
+To Be Added
+<br /><br />
 ***UPDATEGAMELIST***
 <br />
 This mode updates the Game List in Gamez from the Gamez.org web service. A json response will be returned with either an error or success message. No additional parameters are needed.
