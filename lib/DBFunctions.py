@@ -531,6 +531,16 @@ def CheckForSameGame(game_name):
     else:
         return True
 
+def UpdateStatusForFolderProcessing(game_name,system,status):
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "update requested_games set status='" + status + "' where game_name='" + game_name + "' and system='" + system + "'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    connection.commit()
+    cursor.close()
+    return
+
 def ApiGetGamesFromTerm(term,system):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     sql = "SELECT GAME_NAME,SYSTEM,COVER FROM GAMES where game_name like '%" + term.replace("'","''") + "%' AND SYSTEM LIKE '%" + system + "%' ORDER BY GAME_NAME ASC"

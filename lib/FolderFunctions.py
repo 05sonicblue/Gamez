@@ -127,7 +127,13 @@ def ProcessFolder(folderPath):
                         dest = destPath + os.sep + newFileName
                         src = subdir + os.sep + file
                         LogEvent("Moving File " + src + " to " + dest)
-                        shutil.move(src,dest)
+                        try:
+                            shutil.move(src,dest)
+                            #Update status to wanted
+                            if(game_name <> "" and system <> ""):
+                                UpdateStatusForFolderProcessing(game_name,system,'Downloaded')
+                        except:
+                            LogEvent("Error Moving File")
                         LogEvent(game_name + " Processed Successfully")
                     else:
                         LogEvent("Destination Folder Not Set")
