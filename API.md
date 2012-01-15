@@ -38,8 +38,12 @@ Examples:
 
 ***GETREQUESTED***
 <br />
-To Be Added
-<br /><br />
+This mode returns a list of the games that have been requested. The result is in the same format as the SEARCH mode. No additional parameters are needed.
+
+Examples:
+<br />
+&nbsp;&nbsp;&nbsp;Get Requested Games: http://127.0.0.1:8085/api?api_key=ikzFRzA1Y8I1UajNJAOQ803TbTYk1vLB64A9SxrAxAw&mode=GETREQUESTED
+<br />
 ***ADDREQUESTED***
 <br />
 To Be Added

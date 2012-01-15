@@ -1,7 +1,7 @@
 import cherrypy
 import json
 import os
-from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,ApiGetGamesFromTerm,AddComingSoonGames,GetUpcomingGames,AddGameUpcomingToDb
+from DBFunctions import GetGamesFromTerm, GetGameDataFromTerm, AddGameToDb, GetRequestedGames, RemoveGameFromDb, UpdateStatus, GetLog, ClearDBLog,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,ApiGetGamesFromTerm,AddComingSoonGames,GetUpcomingGames,AddGameUpcomingToDb,ApiGetRequestedGames
 from UpgradeFunctions import CheckForNewVersion,IgnoreVersion,UpdateToLatestVersion
 import ConfigParser
 from time import sleep
@@ -10,6 +10,7 @@ from xml.dom import minidom
 import base64
 import hashlib
 import random
+from lib.FolderFunctions import *
 
 class WebRoot:
     appPath = ''
@@ -776,35 +777,35 @@ class WebRoot:
 									<td>
 										<label><b>Blackhole Torrent Download Directory</b></label>
 										<br />
-										<input style="width:400px" type="text" name="torrentBlackholeDownloadDirectory" id="torrentBlackholeDownloadDirectory" value='""" + config.get('Folders','torrent_completed').replace('"','') +  """' />
+										<input style="width:400px" type="text" name="torrentBlackholeDownloadDirectory" id="torrentBlackholeDownloadDirectory" value='""" + config.get('Folders','torrent_completed').replace('"','').replace("\\\\","\\") +  """' />
 									</td>
 								</tr>	
 								<tr>
 									<td>
 										<label><b>Blackhole NZB's Download Directory</b></label>
 										<br />
-										<input style="width:400px" type="text" name="nzbBlackholeDownloadDirectory" id="nzbBlackholeDownloadDirectory" value='""" + config.get('Folders','nzb_completed').replace('"','') +  """' />
+										<input style="width:400px" type="text" name="nzbBlackholeDownloadDirectory" id="nzbBlackholeDownloadDirectory" value='""" + config.get('Folders','nzb_completed').replace('"','').replace("\\\\","\\") +  """' />
 									</td>
 								</tr>
 								<tr>
 									<td>
 										<label><b>Sabnzbd Download Directory</b></label>
 										<br />
-										<input style="width:400px" type="text" name="sabDownloadDirectory" id="sabDownloadDirectory" value='""" + config.get('Folders','sabnzbd_completed').replace('"','') +  """' />
+										<input style="width:400px" type="text" name="sabDownloadDirectory" id="sabDownloadDirectory" value='""" + config.get('Folders','sabnzbd_completed').replace('"','').replace("\\\\","\\") +  """' />
 									</td>
 								</tr>
 								<tr>
 									<td>
 										<label><b>Wii Destination Directory</b></label>
 										<br />
-										<input style="width:400px" type="text" name="wiiDestination" id="wiiDestination" value='""" + config.get('Folders','wii_destination').replace('"','') +  """' />
+										<input style="width:400px" type="text" name="wiiDestination" id="wiiDestination" value='""" + config.get('Folders','wii_destination').replace('"','').replace("\\\\","\\") +  """' />
 									</td>
 								</tr>	
 								<tr>
 									<td>
 										<label><b>XBOX 360 Destination Directory</b></label>
 										<br />
-										<input style="width:400px" type="text" name="xbox360Destination" id="xbox360Destination" value='""" + config.get('Folders','xbox360_destination').replace('"','') +  """' />
+										<input style="width:400px" type="text" name="xbox360Destination" id="xbox360Destination" value='""" + config.get('Folders','xbox360_destination').replace('"','').replace("\\\\","\\") +  """' />
 									</td>
 								</tr>								
 							</table>	
@@ -1079,11 +1080,13 @@ class WebRoot:
         return html;
 
     @cherrypy.expose
-    def updatestatus(self,game_id='',status=''):
+    def updatestatus(self,game_id='',status='',filePath=''):
         if(os.name <> 'nt'):
             os.chdir(WebRoot.appPath)
         if(status <> ''):
             UpdateStatus(game_id,status)
+        if(status == 'Downloaded'):
+            ProcessDownloaded(game_id,status,filePath)
         raise cherrypy.InternalRedirect('/')
 
     @cherrypy.expose
@@ -1138,74 +1141,74 @@ class WebRoot:
         newznabApi = '"' + newznabApi + '"'
         newznabWiiCat = '"' + newznabWiiCat + '"'
         newznabXbox360Cat = '"' + newznabXbox360Cat + '"'
-	prowlApi = '"' + prowlApi + '"'
-	gamezUsername = '"' + gamezUsername + '"'
-	gamezPassword = '"' + gamezPassword + '"'
-	growlHost = '"' + growlHost + '"'
-	growlPassword = '"' + growlPassword + '"'
-	notifoUsername = '"' + notifoUsername + '"'
-	notifoApi = '"' + notifoApi + '"'
-	nzbBlackholePath = '"' + nzbBlackholePath + '"'
-	torrentBlackholePath = '"' + torrentBlackholePath + '"'
-	wiiDestination = '"' + wiiDestination + '"'
-	xbox360Destination = '"' + xbox360Destination + '"'
-	nzbBlackholeDownloadDirectory = '"' + nzbBlackholeDownloadDirectory + '"'
-	torrentBlackholeDownloadDirectory = '"' + torrentBlackholeDownloadDirectory + '"'
-	sabDownloadDirectory = '"' + sabDownloadDirectory + '"'
-	defaultSearch = '"' + defaultSearch + '"'
-	if(sabnzbdEnabled == 'sabnzbdEnabled'):
+        prowlApi = '"' + prowlApi + '"'
+        gamezUsername = '"' + gamezUsername + '"'
+        gamezPassword = '"' + gamezPassword + '"'
+        growlHost = '"' + growlHost + '"'
+        growlPassword = '"' + growlPassword + '"'
+        notifoUsername = '"' + notifoUsername + '"'
+        notifoApi = '"' + notifoApi + '"'
+        nzbBlackholePath = '"' + nzbBlackholePath + '"'
+        torrentBlackholePath = '"' + torrentBlackholePath + '"'
+        wiiDestination = '"' + wiiDestination.replace("\\","\\\\") + '"'
+        xbox360Destination = '"' + xbox360Destination.replace("\\","\\\\") + '"'
+        nzbBlackholeDownloadDirectory = '"' + nzbBlackholeDownloadDirectory.replace("\\","\\\\") + '"'
+        torrentBlackholeDownloadDirectory = '"' + torrentBlackholeDownloadDirectory.replace("\\","\\\\") + '"'
+        sabDownloadDirectory = '"' + sabDownloadDirectory.replace("\\","\\\\") + '"'
+        defaultSearch = '"' + defaultSearch + '"'
+        if(sabnzbdEnabled == 'sabnzbdEnabled'):
             sabnzbdEnabled = "1"
         else:
             sabnzbdEnabled = "0"
-	if(nzbmatrixEnabled == 'nzbmatrixEnabled'):
+        if(nzbmatrixEnabled == 'nzbmatrixEnabled'):
             nzbmatrixEnabled = "1"
         else:
             nzbmatrixEnabled = "0"
-	if(newznabEnabled == 'newznabEnabled'):
+        if(newznabEnabled == 'newznabEnabled'):
             newznabEnabled = "1"
         else:
             newznabEnabled = "0"        
-	if(growlEnabled == 'growlEnabled'):
+        if(growlEnabled == 'growlEnabled'):
             growlEnabled = "1"
         else:
             growlEnabled = "0" 
-	if(prowlEnabled == 'prowlEnabled'):
+        if(prowlEnabled == 'prowlEnabled'):
             prowlEnabled = "1"
         else:
             prowlEnabled = "0"       
-	if(notifoEnabled == 'notifoEnabled'):
+        if(notifoEnabled == 'notifoEnabled'):
             notifoEnabled = "1"
         else:
             notifoEnabled = "0"     
-	if(nzbBlackholeEnabled == 'nzbBlackholeEnabled'):
+        if(nzbBlackholeEnabled == 'nzbBlackholeEnabled'):
             nzbBlackholeEnabled = "1"
         else:
             nzbBlackholeEnabled = "0"    
-	if(torrentBlackholeEnabled == 'torrentBlackholeEnabled'):
+        if(torrentBlackholeEnabled == 'torrentBlackholeEnabled'):
             torrentBlackholeEnabled = "1"
         else:
             torrentBlackholeEnabled = "0"  
-	if(katEnabled == 'katEnabled'):
+        if(katEnabled == 'katEnabled'):
             katEnabled = "1"
         else:
             katEnabled = "0"  
-	if(processTorrentsDirectoryEnabled == 'processTorrentsDirectoryEnabled'):
+        if(processTorrentsDirectoryEnabled == 'processTorrentsDirectoryEnabled'):
             processTorrentsDirectoryEnabled = "1"
         else:
             processTorrentsDirectoryEnabled = "0"   
-	if(processNzbsDirectoryEnabled == 'processNzbsDirectoryEnabled'):
+        if(processNzbsDirectoryEnabled == 'processNzbsDirectoryEnabled'):
             processNzbsDirectoryEnabled = "1"
         else:
             processNzbsDirectoryEnabled = "0"   
-	if(processSabDirectoryEnabled == 'processSabDirectoryEnabled'):
+        if(processSabDirectoryEnabled == 'processSabDirectoryEnabled'):
             processSabDirectoryEnabled = "1"
         else:
             processSabDirectoryEnabled = "0"   
-	if(processXbox360Enabled == 'processXbox360Enabled'):
+        if(processXbox360Enabled == 'processXbox360Enabled'):
             processXbox360Enabled = "1"
         else:
             processXbox360Enabled = "0"               
-	if(processWiiEnabled == 'processWiiEnabled'):
+        if(processWiiEnabled == 'processWiiEnabled'):
             processWiiEnabled = "1"
         else:
             processWiiEnabled = "0"               
@@ -1245,20 +1248,19 @@ class WebRoot:
         config.set('Newznab','wii_category_id',newznabWiiCat)
         config.set('Newznab','xbox360_category_id',newznabXbox360Cat)
         config.set('Newznab','api_key',newznabApi)
-	config.set('Notifications','prowl_api',prowlApi)
-	config.set('Notifications','growl_host',growlHost)
-	config.set('Notifications','growl_port',growlPort)
-	config.set('Notifications','growl_password',growlPassword)
-	config.set('Notifications','notifo_username',notifoUsername)
-	config.set('Notifications','notifo_apikey',notifoApi)
-	config.set('Blackhole','nzb_blackhole_path',nzbBlackholePath)
-	config.set('Blackhole','torrent_blackhole_path',torrentBlackholePath)	
-	config.set('Folders','torrent_completed',torrentBlackholeDownloadDirectory)	
-	config.set('Folders','nzb_completed',nzbBlackholeDownloadDirectory)
-	config.set('Folders','sabnzbd_completed',sabDownloadDirectory)
-	config.set('Folders','xbox360_destination',xbox360Destination)
-	config.set('Folders','wii_destination',wiiDestination)
-	
+        config.set('Notifications','prowl_api',prowlApi)
+        config.set('Notifications','growl_host',growlHost)
+        config.set('Notifications','growl_port',growlPort)
+        config.set('Notifications','growl_password',growlPassword)
+        config.set('Notifications','notifo_username',notifoUsername)
+        config.set('Notifications','notifo_apikey',notifoApi)
+        config.set('Blackhole','nzb_blackhole_path',nzbBlackholePath)
+        config.set('Blackhole','torrent_blackhole_path',torrentBlackholePath)	
+        config.set('Folders','torrent_completed',torrentBlackholeDownloadDirectory)	
+        config.set('Folders','nzb_completed',nzbBlackholeDownloadDirectory)
+        config.set('Folders','sabnzbd_completed',sabDownloadDirectory)
+        config.set('Folders','xbox360_destination',xbox360Destination)
+        config.set('Folders','wii_destination',wiiDestination)
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)
         status = "Application Settings Updated Successfully. Gamez is restarting. If after 5 seconds, Gamez isn't working, update the Gamez.ini file and re-launch Gamez"
@@ -1285,22 +1287,25 @@ class WebRoot:
             elif(mode == 'UPDATEGAMELIST'):
             	try:
             	    AddWiiGamesIfMissing()
-		    AddXbox360GamesIfMissing()
-		    AddComingSoonGames()
-		    return json.dumps({"Response":"Game list has been updated successfully"})
+                    AddXbox360GamesIfMissing()
+                    AddComingSoonGames()
+                    return json.dumps({"Response":"Game list has been updated successfully"})
             	except:
             	    return json.dumps({"Error" : "Error Updating Game List"})
+            elif(mode == 'GETREQUESTED'):
+            	return ApiGetRequestedGames()
+            elif(mode == 'ADDREQUESTED'):
+            	response = {"Error" : mode + " Mode Not Implemented"}
+            elif(mode == 'DELETEREQUESTED'):
+            	response = {"Error" : mode + " Mode Not Implemented"}   
+            elif(mode == 'UPDATEREQUESTEDSTATUS'):
+            	response = {"Error" : mode + " Mode Not Implemented"}
+            elif(mode == 'SEARCHUPCOMING'):
+            	response = {"Error" : mode + " Mode Not Implemented"}     
+            elif(mode == 'ADDUPCOMINGTOREQUESTED'):
+            	response = {"Error" : mode + " Mode Not Implemented"}             	
             else:
                 response = {"Error" : mode + " Mode Not Implemented"}
-
-            #TODO: Get List of requested games
-
-            #TODO: Add Game to requested list
-
-            #TODO: Remove game from requested list
-
-            #TODO: Update game list from gamezapp.org web service
-
             return json.dumps(response)
         return json.dumps({"Error" : "Unkown Error"})     
 

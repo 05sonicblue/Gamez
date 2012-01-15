@@ -188,57 +188,57 @@ def CheckConfigForAllKeys(app_path):
         changesMade = True
 
     if(config.has_option('Notifications','prowl_api') == False):
-	config.set('Notifications','prowl_api','""')
-	changesMade = True
+        config.set('Notifications','prowl_api','""')
+        changesMade = True
 
     if(config.has_option('Notifications','growl_host') == False):
-	config.set('Notifications','growl_host','""')
-	changesMade = True
+        config.set('Notifications','growl_host','""')
+        changesMade = True
 
     if(config.has_option('Notifications','growl_port') == False):
-	config.set('Notifications','growl_port','23053')
-	changesMade = True
-	
+        config.set('Notifications','growl_port','23053')
+        changesMade = True
+
     if(config.has_option('Notifications','growl_password') == False):
-	config.set('Notifications','growl_password','""')
-	changesMade = True	
-	
+        config.set('Notifications','growl_password','""')
+        changesMade = True	
+
     if(config.has_option('Notifications','notifo_username') == False):
-	config.set('Notifications','notifo_username','""')
-	changesMade = True	
-	
+        config.set('Notifications','notifo_username','""')
+        changesMade = True	
+
     if(config.has_option('Notifications','notifo_apikey') == False):
-	config.set('Notifications','notifo_apikey','""')
-	changesMade = True
-	
+        config.set('Notifications','notifo_apikey','""')
+        changesMade = True
+
     if(config.has_option('Blackhole','nzb_blackhole_path') == False):
-	config.set('Blackhole','nzb_blackhole_path','""')
-	changesMade = True	
+        config.set('Blackhole','nzb_blackhole_path','""')
+        changesMade = True	
 
     if(config.has_option('Blackhole','torrent_blackhole_path') == False):
-	config.set('Blackhole','torrent_blackhole_path','""')
-	changesMade = True	
-	
-    if(config.has_option('Folders','torrent_blackhole_path') == False):
-	config.set('Folders','torrent_completed','""')
-	changesMade = True	
-	
-    if(config.has_option('Folders','torrent_blackhole_path') == False):
-	config.set('Folders','nzb_completed','""')
-	changesMade = True	
-	
-    if(config.has_option('Folders','torrent_blackhole_path') == False):
-	config.set('Folders','sabnzbd_completed','""')
-	changesMade = True
-	
+        config.set('Blackhole','torrent_blackhole_path','""')
+        changesMade = True	
+
+    if(config.has_option('Folders','torrent_completed') == False):
+        config.set('Folders','torrent_completed','""')
+        changesMade = True	
+
+    if(config.has_option('Folders','nzb_completed') == False):
+        config.set('Folders','nzb_completed','""')
+        changesMade = True	
+
+    if(config.has_option('Folders','sabnzbd_completed') == False):
+        config.set('Folders','sabnzbd_completed','""')
+        changesMade = True
+
     if(config.has_option('Folders','wii_destination') == False):
-	config.set('Folders','wii_destination','""')
-	changesMade = True	
-	
+        config.set('Folders','wii_destination','""')
+        changesMade = True	
+
     if(config.has_option('Folders','xbox360_destination') == False):
-	config.set('Folders','xbox360_destination','""')
-	changesMade = True	
-	
+        config.set('Folders','xbox360_destination','""')
+        changesMade = True	
+
     if(changesMade):
         with open(configFilePath,'wb') as configFile:
             config.write(configFile)

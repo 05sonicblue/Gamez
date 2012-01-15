@@ -111,7 +111,7 @@ def GetRequestedGames(filter=''):
             game_type = str(record[2])
             status = str(record[3])
             system = str(record[4])
-	    cover = str(record[5])
+            cover = str(record[5])
             rowdata = "<tr align='center'><td><a href='removegame?dbid=" + db_id + "'>Delete</a></td><td><center><img width='85' height='120'  src='" + cover + "' /></center></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td><td>" + status + "</td><td><select id=updateSatusSelectObject class=ui-widget onchange=UpdateGameStatus(this.options[this.selectedIndex].value,'" + db_id + "')>"
             if(status == "Snatched"):
                 rowdata = rowdata + "<option>Downloaded</option><option selected=true>Snatched</option><option>Wanted</option>"
@@ -316,7 +316,7 @@ def AddEventToDB(message):
 
 def GetLog():
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT message,created_date FROM gamez_log order by created_date desc limit 1000"
+    sql = "SELECT message,created_date FROM gamez_log order by created_date desc,id desc limit 1000"
     data = ''
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -369,7 +369,7 @@ def AddWiiGamesIfMissing():
         for data in json_data:
             game_name = data['GameTitle']
             game_type = data['GameType'] 
-	    game_cover = data['GameCover']
+            game_cover = data['GameCover']
             db_path = os.path.join(os.path.abspath(""),"Gamez.db")
             sql = "SELECT count(ID) from games where game_name = '" + game_name.replace("'","''") + "' AND system='Wii'"
             connection = sqlite3.connect(db_path)
@@ -445,7 +445,7 @@ def AddComingSoonGames():
         for data in json_data:
             game_name = data['GameTitle']
             release_date = data['ReleaseDate'] 
-	    system = data['System']
+            system = data['System']
             db_path = os.path.join(os.path.abspath(""),"Gamez.db")
             sql = "SELECT count(ID) from comingsoon where gametitle = '" + game_name.replace("'","''") + "' AND system='" + system + "'"
             connection = sqlite3.connect(db_path)
@@ -484,6 +484,53 @@ def GetUpcomingGames():
     cursor.close()
     return data
 
+def GetRequestedGameName(db_id):
+    game_name = "[" + db_id + "]"
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "select Game_name from requested_games where ID = '" + db_id + "'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()[0]
+    game_name = str(result[0])
+    cursor.close()
+    return game_name
+
+def GetRequestedGameSystem(db_id):
+    system = ""
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "select System from requested_games where ID = '" + db_id + "'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()[0]
+    system = str(result[0])
+    cursor.close()
+    return system
+
+def GetRequestedGamesForFolderProcessing():
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "select Game_name,system from requested_games"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+def CheckForSameGame(game_name):
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "select count(ID) from requested_games where Game_name = '" + game_name + "'"
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()[0][0]
+    cursor.close()
+    if(int(result) == 1):
+        return False
+    else:
+        return True
+
 def ApiGetGamesFromTerm(term,system):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
     sql = "SELECT GAME_NAME,SYSTEM,COVER FROM GAMES where game_name like '%" + term.replace("'","''") + "%' AND SYSTEM LIKE '%" + system + "%' ORDER BY GAME_NAME ASC"
@@ -506,4 +553,28 @@ def ApiGetGamesFromTerm(term,system):
     data = '["Games":' + data + ']'
     return data
     
-   
+def ApiGetRequestedGames():
+    db_path = os.path.join(os.path.abspath(""),"Gamez.db")
+    sql = "SELECT GAME_NAME,SYSTEM,COVER FROM REQUESTED_GAMES ORDER BY GAME_NAME ASC"
+    data = ""
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    for record in result:
+        try:
+            game_name = str(record[0])
+            system = str(record[1])
+            cover = str(record[2])
+            rowdata = '{"GameTitle":"' + game_name + '","System":"' + system + '","GameCover":"' + cover + '"},'
+            data = data + rowdata
+        except:
+            continue
+    cursor.close()
+    data = data[:-1]
+    if(data == ""):
+    	data = '"None"'
+    data = '["Games":' + data + ']'
+    return data
+    
+      

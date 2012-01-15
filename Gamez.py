@@ -17,6 +17,7 @@ from lib.ConfigFunctions import CheckConfigForAllKeys
 from lib.DBFunctions import ValidateDB,AddWiiGamesIfMissing,AddXbox360GamesIfMissing,AddComingSoonGames
 from lib.Logger import LogEvent
 import cherrypy.lib.auth_basic
+from lib.FolderFunctions import *
 
 app_path = os.path.dirname(os.path.abspath("__FILE__"))
 config_path = os.path.join(app_path,'Gamez.ini')
@@ -35,7 +36,7 @@ class RunApp():
         theme_path = os.path.join(css_path,'redmond')
         theme_images_path = os.path.join(theme_path,'images')
         config = ConfigParser.RawConfigParser()
-	config.read('Gamez.ini')
+        config.read('Gamez.ini')
         username = config.get('global','user_name').replace('"','')
         password = config.get('global','password').replace('"','')
         useAuth = False
@@ -70,16 +71,16 @@ class RunApp():
         updateGameListInterval = config.get('Scheduler','game_list_update_interval').replace('"','')
         fInterval = float(interval)
         fUpdateGameListInterval = float(updateGameListInterval)
-	#thread.start_new_thread(ScheduleGameTasks,(fInterval,))
-        #workerTask = cherrypy.process.plugins.BackgroundTask(fInterval,RunGameTask)
-        #gameListUpdaterWorkTask = cherrypy.process.plugins.BackgroundTask(fUpdateGameListInterval,RunGameListUpdaterTask)
         try:
             LogEvent("Setting up download scheduler")
             gameTasksScheduler = cherrypy.process.plugins.Monitor(cherrypy.engine,RunGameTask,fInterval)
-	    gameTasksScheduler.subscribe()
-	    LogEvent("Setting up game list update scheduler")
-	    gameListUpdaterScheduler = cherrypy.process.plugins.Monitor(cherrypy.engine,RunGameListUpdaterTask,fUpdateGameListInterval)
-	    gameListUpdaterScheduler.subscribe()
+            gameTasksScheduler.subscribe()
+            LogEvent("Setting up game list update scheduler")
+            gameListUpdaterScheduler = cherrypy.process.plugins.Monitor(cherrypy.engine,RunGameListUpdaterTask,fUpdateGameListInterval)
+            gameListUpdaterScheduler.subscribe()
+            LogEvent("Setting up folder processing scheduler")
+            folderProcessingScheduler = cherrypy.process.plugins.Monitor(cherrypy.engine,RunFolderProcessingTask,float(900))
+            folderProcessingScheduler.subscribe()
             LogEvent("Starting the Gamez web server")
             cherrypy.quickstart(WebRoot(app_path),'/',config=conf)
         except KeyboardInterrupt:
@@ -103,6 +104,8 @@ def GenerateSabPostProcessScript():
     file.write("\n")
     file.write('import urllib')
     file.write("\n")
+    file.write("filePath = str(sys.argv[1])")
+    file.write("\n")
     file.write('fields = str(sys.argv[3]).split("-")')
     file.write("\n")
     file.write('gamezID = fields[0].replace("[","").replace("]","").replace(" ","")')
@@ -115,7 +118,7 @@ def GenerateSabPostProcessScript():
     file.write("\n")
     file.write("    downloadStatus = 'Downloaded'")
     file.write("\n")
-    file.write('url = "' + gamezBaseUrl + 'updatestatus?game_id=" + gamezID + "&status=" + downloadStatus')
+    file.write('url = "' + gamezBaseUrl + 'updatestatus?game_id=" + gamezID + "&filePath=" + urllib.quote(filePath) + "&status=" + downloadStatus')
     file.write("\n")
     file.write('responseObject = urllib.FancyURLopener({}).open(url)')
     file.write("\n")
@@ -125,6 +128,9 @@ def GenerateSabPostProcessScript():
     file.write("\n")
     file.write('print("Processing Completed Successfully")')
     file.close
+    LogEvent("Setting permissions on post process script")
+    cmd = "chmod +x '" + postProcessScript + "'"
+    os.system(cmd)
 
 def RunGameTask():
     try:
@@ -172,10 +178,20 @@ def RunGameListUpdaterTask():
             errorMessage = errorMessage + " - " + str(message)
         LogEvent(errorMessage)
 
+def RunFolderProcessingTask():
+    try:
+        ScanFoldersToProcess()
+    except:
+        errorMessage = "Error occurred while processing folders"
+        for message in sys.exc_info():
+            errorMessage = errorMessage + " - " + str(message)
+        LogEvent(errorMessage)
+
 if __name__ == '__main__':
     app_path = sys.path[0]
     LogEvent("Checking DB")
     ValidateDB()
+    LogEvent("Checking config file for completeness")
     CheckConfigForAllKeys(app_path)
     config = ConfigParser.RawConfigParser()
     configFilePath = os.path.join(app_path,'Gamez.ini')
@@ -190,8 +206,7 @@ if __name__ == '__main__':
     	config.set('Folders','sabnzbd_completed','"' + sabCompleted + '"')
     	LogEvent("Trying to save")
     	with open(configFilePath,'wb') as configFile:
-            config.write(configFile)
-    LogEvent("Checking config file for completeness")    
+            config.write(configFile)    
     isToDaemonize = 0
     params = sys.argv
     for param in params:

@@ -26,7 +26,7 @@ class GameTasks():
                 system = str(game[2])
                 LogEvent("Searching for game: " + game_name)
                 isDownloaded = False
-		if(isNzbMatrixEnabled == "1"):
+                if(isNzbMatrixEnabled == "1"):
                     if(nzbmatrixusername <> '' and nzbmatrixapi <> ''):
                         if(isDownloaded == False):
                             LogEvent("Checking for game [" + game_name + "] on NZB Matrix")
@@ -180,8 +180,8 @@ class GameTasks():
                         UpdateStatus(game_id,"Snatched")
                         return result
         except:
-	    LogEvent("Unable to connect to KickAss Torrents")  
-    	return
+            LogEvent("Unable to connect to KickAss Torrents")  
+    	    return
     	
     def DownloadTorrent(self,torrentUrl,title,torrentBlackholePath):
     	try:
@@ -197,8 +197,8 @@ class GameTasks():
     	url = "http://" + sabnzbdHost + ":" + sabnzbdPort + "/sabnzbd/api?mode=get_config&apikey=" + sabnzbdApi + "&section=misc&keyword=complete_dir"
     	try:
     	    opener = urllib.FancyURLopener({})
-	    responseObject = opener.open(url)
-	    response = responseObject.read()
+            responseObject = opener.open(url)
+            response = responseObject.read()
             responseObject.close()
             completedDir = response.split(":")[2].replace("'","").replace(" ","").replace("{","").replace("}","").replace("\n","")
             return completedDir
