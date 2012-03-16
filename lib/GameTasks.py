@@ -11,14 +11,14 @@ import json
 
 class GameTasks():
 
-    def FindGames(self, nzbmatrixusername, nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath,isTorrentBlackholeEnabled,isTorrentKATEnabled,torrentBlackholePath):
+    def FindGames(self, manualSearchGame,nzbmatrixusername, nzbmatrixapi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath,isTorrentBlackholeEnabled,isTorrentKATEnabled,torrentBlackholePath):
         if(isSabEnabled == "1"):       
             GameTasks().CheckIfPostProcessExistsInSab(sabnzbdApi,sabnzbdHost,sabnzbdPort)
         nzbmatrixusername = nzbmatrixusername.replace('"','')
         nzbmatrixapi = nzbmatrixapi.replace('"','')
         newznabApi = newznabApi.replace('"','')     
         newznabWiiCat = newznabWiiCat.replace('"','')  
-        games = GetRequestedGamesAsArray()
+        games = GetRequestedGamesAsArray(manualSearchGame)
         for game in games:
             try:
                 game_name = str(game[0])

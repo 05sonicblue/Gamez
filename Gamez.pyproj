@@ -3,10 +3,9 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{00000000-0000-0000-0000-000000000000}</ProjectGuid>
+    <ProjectGuid>{8cc016a0-bf76-4414-8742-661a8ad2e8ca}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>Gamez.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,5 +21,183 @@
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="API.md" />
+    <Content Include="Gamez.db" />
+    <Content Include="Gamez.ini" />
+    <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="cherrypy\lib\auth.py" />
+    <Compile Include="cherrypy\lib\auth_basic.py" />
+    <Compile Include="cherrypy\lib\auth_digest.py" />
+    <Compile Include="cherrypy\lib\caching.py" />
+    <Compile Include="cherrypy\lib\covercp.py" />
+    <Compile Include="cherrypy\lib\cpstats.py" />
+    <Compile Include="cherrypy\lib\cptools.py" />
+    <Compile Include="cherrypy\lib\encoding.py" />
+    <Compile Include="cherrypy\lib\gctools.py" />
+    <Compile Include="cherrypy\lib\http.py" />
+    <Compile Include="cherrypy\lib\httpauth.py" />
+    <Compile Include="cherrypy\lib\httputil.py" />
+    <Compile Include="cherrypy\lib\jsontools.py" />
+    <Compile Include="cherrypy\lib\profiler.py" />
+    <Compile Include="cherrypy\lib\reprconf.py" />
+    <Compile Include="cherrypy\lib\sessions.py" />
+    <Compile Include="cherrypy\lib\static.py" />
+    <Compile Include="cherrypy\lib\xmlrpcutil.py" />
+    <Compile Include="cherrypy\lib\__init__.py" />
+    <Compile Include="cherrypy\process\plugins.py" />
+    <Compile Include="cherrypy\process\servers.py" />
+    <Compile Include="cherrypy\process\win32.py" />
+    <Compile Include="cherrypy\process\wspbus.py" />
+    <Compile Include="cherrypy\process\__init__.py" />
+    <Compile Include="cherrypy\scaffold\__init__.py" />
+    <Compile Include="cherrypy\test\benchmark.py" />
+    <Compile Include="cherrypy\test\checkerdemo.py" />
+    <Compile Include="cherrypy\test\helper.py" />
+    <Compile Include="cherrypy\test\logtest.py" />
+    <Compile Include="cherrypy\test\modfastcgi.py" />
+    <Compile Include="cherrypy\test\modfcgid.py" />
+    <Compile Include="cherrypy\test\modpy.py" />
+    <Compile Include="cherrypy\test\modwsgi.py" />
+    <Compile Include="cherrypy\test\sessiondemo.py" />
+    <Compile Include="cherrypy\test\test_auth_basic.py" />
+    <Compile Include="cherrypy\test\test_auth_digest.py" />
+    <Compile Include="cherrypy\test\test_bus.py" />
+    <Compile Include="cherrypy\test\test_caching.py" />
+    <Compile Include="cherrypy\test\test_config.py" />
+    <Compile Include="cherrypy\test\test_config_server.py" />
+    <Compile Include="cherrypy\test\test_conn.py" />
+    <Compile Include="cherrypy\test\test_core.py" />
+    <Compile Include="cherrypy\test\test_dynamicobjectmapping.py" />
+    <Compile Include="cherrypy\test\test_encoding.py" />
+    <Compile Include="cherrypy\test\test_etags.py" />
+    <Compile Include="cherrypy\test\test_http.py" />
+    <Compile Include="cherrypy\test\test_httpauth.py" />
+    <Compile Include="cherrypy\test\test_httplib.py" />
+    <Compile Include="cherrypy\test\test_json.py" />
+    <Compile Include="cherrypy\test\test_logging.py" />
+    <Compile Include="cherrypy\test\test_mime.py" />
+    <Compile Include="cherrypy\test\test_misc_tools.py" />
+    <Compile Include="cherrypy\test\test_objectmapping.py" />
+    <Compile Include="cherrypy\test\test_proxy.py" />
+    <Compile Include="cherrypy\test\test_refleaks.py" />
+    <Compile Include="cherrypy\test\test_request_obj.py" />
+    <Compile Include="cherrypy\test\test_routes.py" />
+    <Compile Include="cherrypy\test\test_session.py" />
+    <Compile Include="cherrypy\test\test_sessionauthenticate.py" />
+    <Compile Include="cherrypy\test\test_states.py" />
+    <Compile Include="cherrypy\test\test_static.py" />
+    <Compile Include="cherrypy\test\test_tools.py" />
+    <Compile Include="cherrypy\test\test_tutorials.py" />
+    <Compile Include="cherrypy\test\test_virtualhost.py" />
+    <Compile Include="cherrypy\test\test_wsgiapps.py" />
+    <Compile Include="cherrypy\test\test_wsgi_ns.py" />
+    <Compile Include="cherrypy\test\test_wsgi_vhost.py" />
+    <Compile Include="cherrypy\test\test_xmlrpc.py" />
+    <Compile Include="cherrypy\test\webtest.py" />
+    <Compile Include="cherrypy\test\_test_decorators.py" />
+    <Compile Include="cherrypy\test\_test_states_demo.py" />
+    <Compile Include="cherrypy\test\__init__.py" />
+    <Compile Include="cherrypy\tutorial\bonus-sqlobject.py" />
+    <Compile Include="cherrypy\tutorial\tut01_helloworld.py" />
+    <Compile Include="cherrypy\tutorial\tut02_expose_methods.py" />
+    <Compile Include="cherrypy\tutorial\tut03_get_and_post.py" />
+    <Compile Include="cherrypy\tutorial\tut04_complex_site.py" />
+    <Compile Include="cherrypy\tutorial\tut05_derived_objects.py" />
+    <Compile Include="cherrypy\tutorial\tut06_default_method.py" />
+    <Compile Include="cherrypy\tutorial\tut07_sessions.py" />
+    <Compile Include="cherrypy\tutorial\tut08_generators_and_yield.py" />
+    <Compile Include="cherrypy\tutorial\tut09_files.py" />
+    <Compile Include="cherrypy\tutorial\tut10_http_errors.py" />
+    <Compile Include="cherrypy\tutorial\__init__.py" />
+    <Compile Include="cherrypy\wsgiserver\ssl_builtin.py" />
+    <Compile Include="cherrypy\wsgiserver\ssl_pyopenssl.py" />
+    <Compile Include="cherrypy\wsgiserver\wsgiserver2.py" />
+    <Compile Include="cherrypy\wsgiserver\wsgiserver3.py" />
+    <Compile Include="cherrypy\wsgiserver\__init__.py" />
+    <Compile Include="cherrypy\_cpchecker.py" />
+    <Compile Include="cherrypy\_cpcompat.py" />
+    <Compile Include="cherrypy\_cpconfig.py" />
+    <Compile Include="cherrypy\_cpdispatch.py" />
+    <Compile Include="cherrypy\_cperror.py" />
+    <Compile Include="cherrypy\_cplogging.py" />
+    <Compile Include="cherrypy\_cpmodpy.py" />
+    <Compile Include="cherrypy\_cpnative_server.py" />
+    <Compile Include="cherrypy\_cpreqbody.py" />
+    <Compile Include="cherrypy\_cprequest.py" />
+    <Compile Include="cherrypy\_cpserver.py" />
+    <Compile Include="cherrypy\_cpthreadinglocal.py" />
+    <Compile Include="cherrypy\_cptools.py" />
+    <Compile Include="cherrypy\_cptree.py" />
+    <Compile Include="cherrypy\_cpwsgi.py" />
+    <Compile Include="cherrypy\_cpwsgi_server.py" />
+    <Compile Include="cherrypy\__init__.py" />
+    <Compile Include="cron\base.py" />
+    <Compile Include="cron\eta.py" />
+    <Compile Include="cron\kinepolisrss.py" />
+    <Compile Include="cron\movierss.py" />
+    <Compile Include="cron\renamer.py" />
+    <Compile Include="cron\subtitle.py" />
+    <Compile Include="cron\trailer.py" />
+    <Compile Include="cron\trakt.py" />
+    <Compile Include="cron\yarr.py" />
+    <Compile Include="cron\__init__.py" />
+    <Compile Include="Gamez.py" />
+    <Compile Include="gntp\notifier.py" />
+    <Compile Include="gntp\__init__.py" />
+    <Compile Include="lib\ConfigFunctions.py" />
+    <Compile Include="lib\Constants.py" />
+    <Compile Include="lib\DBFunctions.py" />
+    <Compile Include="lib\feedparser.py" />
+    <Compile Include="lib\FolderFunctions.py" />
+    <Compile Include="lib\GameTasks.py" />
+    <Compile Include="lib\Logger.py" />
+    <Compile Include="lib\Notifications.py" />
+    <Compile Include="lib\Notifo.py" />
+    <Compile Include="lib\UpgradeFunctions.py" />
+    <Compile Include="lib\WebRoot.py" />
+    <Compile Include="lib\__init__.py" />
+    <Compile Include="postprocess\gamezPostProcess.py" />
+    <Compile Include="prowlpy\prowlpy.py" />
+    <Compile Include="prowlpy\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".git\" />
+    <Folder Include=".git\hooks\" />
+    <Folder Include=".git\info\" />
+    <Folder Include=".git\logs\" />
+    <Folder Include=".git\logs\refs\" />
+    <Folder Include=".git\logs\refs\heads\" />
+    <Folder Include=".git\objects\" />
+    <Folder Include=".git\objects\info\" />
+    <Folder Include=".git\objects\pack\" />
+    <Folder Include=".git\refs\" />
+    <Folder Include=".git\refs\heads\" />
+    <Folder Include=".git\refs\remotes\" />
+    <Folder Include=".git\refs\remotes\origin\" />
+    <Folder Include=".git\refs\tags\" />
+    <Folder Include="cherrypy\" />
+    <Folder Include="cherrypy\lib\" />
+    <Folder Include="cherrypy\process\" />
+    <Folder Include="cherrypy\scaffold\" />
+    <Folder Include="cherrypy\scaffold\static\" />
+    <Folder Include="cherrypy\test\" />
+    <Folder Include="cherrypy\test\static\" />
+    <Folder Include="cherrypy\tutorial\" />
+    <Folder Include="cherrypy\wsgiserver\" />
+    <Folder Include="cron\" />
+    <Folder Include="css\" />
+    <Folder Include="css\datatables_images\" />
+    <Folder Include="css\navigation_images\" />
+    <Folder Include="css\redmond\" />
+    <Folder Include="css\redmond\images\" />
+    <Folder Include="gntp\" />
+    <Folder Include="js\" />
+    <Folder Include="lib\" />
+    <Folder Include="postprocess\" />
+    <Folder Include="prowlpy\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>

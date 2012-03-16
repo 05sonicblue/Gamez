@@ -112,7 +112,7 @@ def GetRequestedGames(filter=''):
             status = str(record[3])
             system = str(record[4])
             cover = str(record[5])
-            rowdata = "<tr align='center'><td><a href='removegame?dbid=" + db_id + "'>Delete</a></td><td><center><img width='85' height='120'  src='" + cover + "' /></center></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td><td>" + status + "</td><td><select id=updateSatusSelectObject class=ui-widget onchange=UpdateGameStatus(this.options[this.selectedIndex].value,'" + db_id + "')>"
+            rowdata = "<tr align='center'><td><a href='removegame?dbid=" + db_id + "'>Delete</a>&nbsp;|&nbsp;<a href='forcesearch?dbid=" + db_id + "'>Force Search</a></td><td><center><img width='85' height='120'  src='" + cover + "' /></center></td><td>" + game_name + "</td><td>" + game_type + "</td><td>" + system + "</td><td>" + status + "</td><td><select id=updateSatusSelectObject class=ui-widget onchange=UpdateGameStatus(this.options[this.selectedIndex].value,'" + db_id + "')>"
             if(status == "Snatched"):
                 rowdata = rowdata + "<option>Downloaded</option><option selected=true>Snatched</option><option>Wanted</option>"
             elif(status == "Downloaded"):
@@ -137,9 +137,12 @@ def RemoveGameFromDb(db_id):
     cursor.close()
     return
 
-def GetRequestedGamesAsArray():
+def GetRequestedGamesAsArray(manualSearchGame):
     db_path = os.path.join(os.path.abspath(""),"Gamez.db")
-    sql = "SELECT game_name,ID,system FROM requested_games WHERE status='Wanted' order by game_name asc"
+    if(manualSearchGame <> ''):
+        sql = "SELECT game_name,ID,system FROM requested_games WHERE id='" + manualSearchGame + "' order by game_name asc"
+    else:
+        sql = "SELECT game_name,ID,system FROM requested_games WHERE status='Wanted' order by game_name asc"
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(sql)

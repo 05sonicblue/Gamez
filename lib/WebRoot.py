@@ -11,6 +11,8 @@ import base64
 import hashlib
 import random
 from lib.FolderFunctions import *
+from Constants import *
+from GameTasks import *
 
 class WebRoot:
     appPath = ''
@@ -127,7 +129,7 @@ class WebRoot:
                 <thead>
                   <tr>
                     <th>Actions</th>
-		    <th>Cover</th>
+		            <th>Cover</th>
                     <th>Game Name</th>
                     <th>Game Type</th>
                     <th>System</th>
@@ -141,7 +143,7 @@ class WebRoot:
                 </tbody>
               </table>
               <script>$(document).ready(function() {
-	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false});});
+	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":true,"bLengthChange":false});});
               </script>
              """
         html = html + """
@@ -263,7 +265,7 @@ class WebRoot:
                 </tbody>
               </table>
               <script>$(document).ready(function() {
-	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false});});
+	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":true,"bLengthChange":false});});
               </script>
              """
         html = html + """
@@ -820,6 +822,7 @@ class WebRoot:
 		</script>
                 
 		<br /><br />
+        <div style="margin-left:5px">Gamez Version: """ + VersionNumber() + """</div>
 		<div align="right" style="margin-right:20px">
 			<button style="border:0; margin:0; padding:0;clear:both;margin-left:250px;width:125px;height:31px;background:#666666 url(img/button.png) no-repeat;text-align:center;line-height:31px;color:#FFFFFF;font-size:11px;font-weight:bold;" type="submit">Save Settings</button>
 		</div>	
@@ -1067,7 +1070,7 @@ class WebRoot:
                 </tbody>
               </table>
               <script>$(document).ready(function() {
-	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":false,"bLengthChange":false,"iDisplayLength":25});});
+	            oTable = $('#searchresults').dataTable({"bJQueryUI": true,"bSort":true,"bLengthChange":false,"iDisplayLength":25});});
               </script>
              """
         html = html + """
@@ -1316,3 +1319,33 @@ class WebRoot:
         AddComingSoonGames()
         status = "Game list has been updated successfully"
         raise cherrypy.InternalRedirect("/?status_message=" + status)
+
+    @cherrypy.expose
+    def forcesearch(self,dbid):
+        if(os.name <> 'nt'):
+            os.chdir(WebRoot.appPath)
+        config = ConfigParser.RawConfigParser()
+        config.read(os.path.join(WebRoot.appPath,'Gamez.ini'))
+        nzbMatrixUser = config.get('NZBMatrix','username').replace('"','')
+        nzbMatrixApi = config.get('NZBMatrix','api_key').replace('"','')
+        sabnzbdHost = config.get('Sabnzbd','host').replace('"','')
+        sabnzbdPort = config.get('Sabnzbd','port').replace('"','')
+        sabnzbdApi = config.get('Sabnzbd','api_key').replace('"','')
+        sabnzbdCategory = config.get('Sabnzbd','category').replace('"','')
+        newznabWiiCat = config.get('Newznab','wii_category_id').replace('"','')
+        newznabXbox360Cat = config.get('Newznab','xbox360_category_id').replace('"','')
+        newznabApi = config.get('Newznab','api_key').replace('"','')
+        newznabHost = config.get('Newznab','host').replace('"','')
+        newznabPort = config.get('Newznab','port').replace('"','')
+        isSabEnabled = config.get('SystemGenerated','sabnzbd_enabled').replace('"','')
+        isNzbMatrixEnabled = config.get('SystemGenerated','nzbmatrix_enabled').replace('"','')
+        isNewznabEnabled = config.get('SystemGenerated','newznab_enabled').replace('"','')
+        isNzbBlackholeEnabled = config.get('SystemGenerated','blackhole_nzb_enabled').replace('"','')
+        nzbBlackholePath = config.get('Blackhole','nzb_blackhole_path').replace('"','')
+        isTorrentBlackholeEnabled = config.get('SystemGenerated','blackhole_torrent_enabled').replace('"','')
+        isTorrentKATEnabled = config.get('SystemGenerated','torrent_kat_enabled').replace('"','')
+        torrentBlackholePath  = config.get('Blackhole','torrent_blackhole_path').replace('"','')
+        manualSearchGame = dbid
+        LogEvent("Searching for games")
+        GameTasks().FindGames(manualSearchGame,nzbMatrixUser,nzbMatrixApi,sabnzbdApi,sabnzbdHost,sabnzbdPort,newznabWiiCat,newznabApi,newznabHost,newznabPort,newznabXbox360Cat,sabnzbdCategory,isSabEnabled,isNzbMatrixEnabled,isNewznabEnabled,isNzbBlackholeEnabled,nzbBlackholePath,isTorrentBlackholeEnabled,isTorrentKATEnabled,torrentBlackholePath)
+        raise cherrypy.InternalRedirect('/')
