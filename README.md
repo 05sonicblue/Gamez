@@ -1,3 +1,5 @@
+Note: I haven't worked on Gamez in 2 years. I am now starting from scratch and rewriting it, starting with a windows based console, instead of python. I am hoping to have a working copy by the end of 2013. Please search for Gamez Server under Riveu.
+
 <hr />
 
 Gamez is currently in *Alpha* release. There may be bugs in the application.
